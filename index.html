@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aqua Capital · Aqua Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #F0F4F8;
+  min-height: 100vh;
+  color: #0f172a;
+}
+
+/* ── LAYOUT ── */
+.app { max-width: 1440px; margin: 0 auto; padding: 28px 24px 60px; }
+
+/* ── HEADER ── */
+.header { margin-bottom: 24px; }
+.header-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.header-icon {
+  width: 28px; height: 28px; border-radius: 6px; background: #2B7BB9;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.header-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  color: #64748b; text-transform: uppercase;
+}
+.header-title { font-size: 26px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 4px; }
+.header-sub { font-size: 13px; color: #94a3b8; }
+
+/* ── TODAY PILL ── */
+.today-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #EEF2FF; color: #4338ca; border: 1.5px solid #c7d2fe;
+  border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600;
+  margin-top: 8px;
+}
+.today-dot { width: 6px; height: 6px; border-radius: 50%; background: #4338ca; }
+
+/* ── CONTROLS ── */
+.controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.filter-btn {
+  padding: 5px 14px; border-radius: 20px; cursor: pointer; font-size: 12px;
+  font-weight: 400; border: 2px solid #e2e8f0; background: #fff; color: #64748b;
+  font-family: inherit; transition: all 0.15s;
+}
+.filter-btn:hover { border-color: #cbd5e1; color: #334155; }
+.filter-btn.active { font-weight: 700; }
+
+.view-toggle {
+  margin-left: auto; display: flex; background: #e2e8f0;
+  border-radius: 8px; padding: 3px; gap: 2px;
+}
+.view-btn {
+  padding: 4px 14px; border-radius: 6px; border: none; font-size: 12px;
+  cursor: pointer; font-family: inherit; background: transparent;
+  color: #64748b; font-weight: 400; transition: all 0.15s;
+}
+.view-btn.active {
+  background: #fff; color: #0f172a; font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ── QUARTER TABS ── */
+.quarter-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.q-tab {
+  padding: 7px 22px; border-radius: 8px; cursor: pointer; font-weight: 600;
+  font-size: 13px; font-family: inherit; border: 2px solid #e2e8f0;
+  background: #fff; color: #64748b; transition: all 0.15s;
+}
+.q-tab.active { border-color: #2B7BB9; background: #2B7BB9; color: #fff; }
+
+/* ── MONTH NAVIGATION (for monthly view) ── */
+.month-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.month-nav-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 2px solid #e2e8f0;
+  background: #fff; color: #64748b; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit; transition: all 0.15s;
+}
+.month-nav-btn:hover { border-color: #2B7BB9; color: #2B7BB9; }
+.month-nav-title { font-size: 20px; font-weight: 700; color: #0f172a; }
+.today-jump {
+  margin-left: auto; padding: 5px 14px; border-radius: 20px; border: 2px solid #e2e8f0;
+  background: #fff; color: #64748b; font-size: 12px; font-weight: 500;
+  font-family: inherit; cursor: pointer; transition: all 0.15s;
+}
+.today-jump:hover { border-color: #2B7BB9; color: #2B7BB9; }
+
+/* ── CALENDAR GRID ── */
+.cal-grid {
+  display: grid;
+  gap: 12px;
+}
+.cal-grid.year  { grid-template-columns: repeat(4, 1fr); }
+.cal-grid.quarter { grid-template-columns: repeat(3, 1fr); }
+.cal-grid.month { grid-template-columns: 1fr; }
+
+/* ── MONTH CARD ── */
+.month-card {
+  background: #fff; border-radius: 12px;
+  border: 1px solid #e2e8f0; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.month-card.is-current { border-color: #2B7BB9; box-shadow: 0 0 0 2px rgba(43,123,185,0.12), 0 2px 8px rgba(0,0,0,0.06); }
+
+.month-header {
+  padding: 10px 14px 9px; border-bottom: 1px solid #f1f5f9;
+  display: flex; justify-content: space-between; align-items: center;
+  background: #fafbfc;
+}
+.month-name { font-weight: 700; color: #0f172a; }
+.month-name.large { font-size: 18px; }
+.month-name.small { font-size: 13px; }
+.month-header-right { display: flex; gap: 6px; align-items: center; }
+.event-count {
+  font-size: 10px; background: #EEF2FF; color: #4338ca;
+  border-radius: 10px; padding: 1px 7px; font-weight: 600;
+}
+.q-badge { font-size: 10px; color: #cbd5e1; font-weight: 500; }
+
+/* ── MONTHLY CALENDAR VIEW ── */
+.cal-weekdays {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  padding: 8px 10px 4px;
+}
+.cal-weekday { text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 0; }
+
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 10px 10px; gap: 2px; }
+.cal-cell {
+  min-height: 90px; border-radius: 8px; padding: 6px 5px;
+  display: flex; flex-direction: column; gap: 3px;
+  border: 1px solid transparent; transition: background 0.1s;
+}
+.cal-cell:hover { background: #f8fafc; }
+.cal-cell.other-month { opacity: 0.3; }
+.cal-cell.today-cell { background: #EEF2FF; border-color: #c7d2fe; }
+.cal-cell.weekend-cell .cell-day-num { color: #94a3b8; }
+
+.cell-day-num {
+  font-size: 12px; font-weight: 600; color: #334155; line-height: 1;
+  margin-bottom: 2px; width: 22px; text-align: center;
+}
+.today-cell .cell-day-num {
+  background: #4338ca; color: #fff; border-radius: 50%;
+  width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+}
+
+.cell-event {
+  font-size: 9.5px; font-weight: 500; padding: 2px 5px; border-radius: 4px;
+  line-height: 1.3; cursor: pointer; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; border-left: 2px solid;
+  transition: opacity 0.15s;
+}
+.cell-event:hover { opacity: 0.8; }
+.cell-more { font-size: 9px; color: #94a3b8; font-weight: 500; padding: 1px 4px; cursor: pointer; }
+.cell-more:hover { color: #4338ca; }
+
+/* ── EVENT LIST (year/quarter views) ── */
+.events-list { padding: 8px 10px; min-height: 80px; }
+
+.event-row {
+  display: flex; gap: 7px; padding: 5px 7px; border-radius: 7px;
+  margin-bottom: 4px; cursor: pointer; transition: opacity 0.15s;
+}
+.event-row:hover { opacity: 0.85; }
+
+.event-day { font-size: 10px; font-weight: 700; min-width: 20px; padding-top: 1px; }
+.event-body { flex: 1; }
+.event-label { font-size: 11px; color: #1e293b; font-weight: 500; line-height: 1.35; }
+.event-tags { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
+.tag-area {
+  font-size: 9px; color: #fff; border-radius: 3px;
+  padding: 1px 5px; font-weight: 600;
+}
+.tag-recur {
+  font-size: 9px; background: #f1f5f9; color: #94a3b8;
+  border-radius: 3px; padding: 1px 5px;
+}
+
+.empty-month { color: #e2e8f0; font-size: 11px; text-align: center; padding: 20px 0; }
+
+/* ── MODAL ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(4px); z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: #fff; border-radius: 16px; padding: 28px;
+  width: 440px; max-width: 92vw; max-height: 90vh; overflow-y: auto;
+  transform: translateY(10px); transition: transform 0.22s;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative;
+}
+.overlay.open .modal { transform: translateY(0); }
+
+.modal-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; font-size: 20px;
+  color: #94a3b8; cursor: pointer; line-height: 1;
+}
+.modal-close:hover { color: #334155; }
+
+.modal-area-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 10px; padding: 3px 8px;
+  border-radius: 4px;
+}
+.modal-title { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 6px; line-height: 1.3; }
+.modal-date { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+.modal-desc { font-size: 14px; color: #475569; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 14px; }
+
+/* ── ADD FORM ── */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 5px; display: block; }
+.form-input {
+  width: 100%; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px;
+  padding: 9px 12px; color: #0f172a; font-family: inherit; font-size: 14px;
+  outline: none; transition: border-color 0.2s;
+}
+.form-input:focus { border-color: #2B7BB9; background: #fff; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.btn-primary {
+  width: 100%; padding: 11px; background: #2B7BB9; color: #fff; border: none;
+  border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s; margin-top: 6px;
+}
+.btn-primary:hover { background: #1a5a8a; }
+.btn-secondary {
+  width: 100%; padding: 11px; background: #f1f5f9; color: #334155; border: none;
+  border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: background 0.15s; margin-top: 6px;
+}
+.btn-secondary:hover { background: #e2e8f0; }
+
+.add-event-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 20px; cursor: pointer;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  background: #EEF2FF; border: 2px solid #c7d2fe; color: #4338ca;
+  transition: all 0.15s;
+}
+.add-event-btn:hover { background: #e0e7ff; border-color: #a5b4fc; }
+
+/* ── LEGEND ── */
+.legend { margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+.legend-label { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+.legend-text { font-size: 11px; color: #475569; }
+.legend-recur { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.recur-badge { font-size: 9px; background: #f1f5f9; color: #64748b; border-radius: 3px; padding: 2px 6px; font-weight: 500; }
+
+/* ── INSTRUCTIONS ── */
+.instructions {
+  margin-top: 24px; background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 12px; padding: 18px 20px;
+}
+.instructions-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #2B7BB9; margin-bottom: 10px; }
+.instructions p { font-size: 13px; color: #64748b; line-height: 1.7; }
+.instructions code { background: #EEF2FF; color: #4338ca; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+@media (max-width: 900px) {
+  .cal-grid.year    { grid-template-columns: repeat(2, 1fr); }
+  .cal-grid.quarter { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .app { padding: 16px 12px 48px; }
+
+  .header-title { font-size: 18px; }
+  .header-eyebrow { font-size: 10px; }
+  .today-pill { font-size: 11px; padding: 3px 10px; }
+
+  .controls { flex-direction: column; align-items: stretch; gap: 10px; }
+  .filter-group { gap: 5px; }
+  .filter-btn { font-size: 11px; padding: 4px 10px; }
+  .add-event-btn { justify-content: center; }
+  .view-toggle { align-self: flex-end; }
+
+  .quarter-tabs { gap: 6px; }
+  .q-tab { padding: 6px 14px; font-size: 12px; }
+
+  .month-nav-title { font-size: 16px; }
+
+  .cal-grid.year    { grid-template-columns: 1fr; }
+  .cal-grid.quarter { grid-template-columns: 1fr; }
+  .cal-grid.month   { grid-template-columns: 1fr; }
+
+  .cal-cell { min-height: 64px; padding: 4px 3px; }
+  .cell-day-num { font-size: 11px; width: 18px; }
+  .today-cell .cell-day-num { width: 18px; height: 18px; font-size: 10px; }
+  .cell-event { font-size: 8.5px; padding: 1px 3px; }
+
+  .event-row { padding: 4px 6px; }
+  .event-label { font-size: 10px; }
+  .tag-area, .tag-recur { font-size: 8px; }
+
+  .modal { padding: 20px 16px; border-radius: 12px; }
+  .modal-title { font-size: 17px; }
+  .form-row { grid-template-columns: 1fr; }
+
+  .legend-recur { display: none; }
+  .legend { gap: 10px; }
+  .legend-text { font-size: 10px; }
+
+  .instructions { padding: 14px 16px; }
+  .instructions p { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <div class="header-icon">📅</div>
+      <span class="header-eyebrow">Aqua Capital · Ops Book</span>
+    </div>
+    <h1 class="header-title">Aqua Calendar</h1>
+    <p class="header-sub" id="subCount"></p>
+    <div class="today-pill">
+      <div class="today-dot"></div>
+      <span id="todayText"></span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="filter-group" id="filterGroup"></div>
+    <button class="add-event-btn" onclick="openAdd()">＋ Novo Evento</button>
+    <div class="view-toggle">
+      <button class="view-btn" id="vbtn-month"  onclick="setView('month')">Mês</button>
+      <button class="view-btn" id="vbtn-quarter" onclick="setView('quarter')">Trimestre</button>
+      <button class="view-btn" id="vbtn-year"   onclick="setView('year')">Ano</button>
+    </div>
+  </div>
+
+  <!-- QUARTER TABS (shown in quarter/month view) -->
+  <div class="quarter-tabs" id="quarterTabs" style="display:none">
+    <button class="q-tab" id="qtab-0" onclick="setQ(0)">Q1</button>
+    <button class="q-tab" id="qtab-1" onclick="setQ(1)">Q2</button>
+    <button class="q-tab" id="qtab-2" onclick="setQ(2)">Q3</button>
+    <button class="q-tab" id="qtab-3" onclick="setQ(3)">Q4</button>
+  </div>
+
+  <!-- MONTH NAV (shown in month view) -->
+  <div class="month-nav" id="monthNav" style="display:none">
+    <button class="month-nav-btn" onclick="navMonth(-1)">‹</button>
+    <div class="month-nav-title" id="monthNavTitle"></div>
+    <button class="month-nav-btn" onclick="navMonth(1)">›</button>
+    <button class="today-jump" onclick="jumpToday()">Hoje</button>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="cal-grid year" id="calGrid"></div>
+
+  <!-- LEGEND -->
+  <div class="legend" id="legend"></div>
+
+  
+
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="overlay" id="detailOverlay" onclick="closeOnBg(event,'detailOverlay')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeAll()">×</button>
+    <div class="modal-area-badge" id="dAreaBadge"></div>
+    <div class="modal-title" id="dTitle"></div>
+    <div class="modal-date" id="dDate"></div>
+    <div class="modal-desc" id="dDesc"></div>
+    <div style="display:flex;gap:8px;margin-top:20px;border-top:1px solid #f1f5f9;padding-top:16px;">
+      <button class="btn-primary" style="flex:1;margin-top:0" onclick="openEdit()">✏️ Editar</button>
+      <button onclick="deleteEvent()" style="padding:11px 16px;background:#FFF4F4;color:#C0392B;border:1.5px solid #fca5a5;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;">🗑 Deletar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="overlay" id="addOverlay" onclick="closeOnBg(event,'addOverlay')">
+  <div class="modal" style="width:460px">
+    <button class="modal-close" onclick="closeAll()">×</button>
+    <div class="modal-title" style="margin-bottom:20px">Novo Evento</div>
+
+    <div class="form-group">
+      <label class="form-label">Título</label>
+      <input class="form-input" type="text" id="evTitle" placeholder="Ex: Board Meeting – Portco X">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Data Início</label>
+        <input class="form-input" type="date" id="evStart">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data Fim</label>
+        <input class="form-input" type="date" id="evEnd">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Área</label>
+      <select class="form-input" id="evArea">
+        <option value="Ops & CS">Ops & CS</option>
+        <option value="Legal">Legal</option>
+        <option value="Regulatory">Regulatory</option>
+        <option value="Tails">Tails</option>
+        <option value="Controllership">Controllership</option>
+        <option value="Compliance">Compliance</option>
+        <option value="ESG">ESG</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Recorrência</label>
+      <select class="form-input" id="evRecur">
+        <option value="">Nenhuma</option>
+        <option value="monthly">Mensal</option>
+        <option value="quarterly">Trimestral</option>
+        <option value="semi-annual">Semestral</option>
+        <option value="annual">Anual</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição (opcional)</label>
+      <textarea class="form-input" id="evDesc" rows="3" placeholder="Detalhes, responsáveis, links..."></textarea>
+    </div>
+    <button class="btn-primary" onclick="addEvent()">Adicionar Evento</button>
+    <button class="btn-secondary" onclick="closeAll()">Cancelar</button>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="editOverlay" onclick="closeOnBg(event,'editOverlay')">
+  <div class="modal" style="width:460px">
+    <button class="modal-close" onclick="closeAll()">×</button>
+    <div class="modal-title" style="margin-bottom:20px">Editar Evento</div>
+
+    <div class="form-group">
+      <label class="form-label">Título</label>
+      <input class="form-input" type="text" id="editTitle">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Mês</label>
+        <select class="form-input" id="editMonth">
+          <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+          <option value="3">Março</option><option value="4">Abril</option>
+          <option value="5">Maio</option><option value="6">Junho</option>
+          <option value="7">Julho</option><option value="8">Agosto</option>
+          <option value="9">Setembro</option><option value="10">Outubro</option>
+          <option value="11">Novembro</option><option value="12">Dezembro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Dia</label>
+        <input class="form-input" type="number" id="editDay" min="1" max="31">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Área</label>
+      <select class="form-input" id="editArea">
+        <option value="Ops & CS">Ops & CS</option>
+        <option value="Legal">Legal</option>
+        <option value="Regulatory">Regulatory</option>
+        <option value="Tails">Tails</option>
+        <option value="Controllership">Controllership</option>
+        <option value="Compliance">Compliance</option>
+        <option value="ESG">ESG</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Recorrência</label>
+      <select class="form-input" id="editRecur">
+        <option value="">Nenhuma</option>
+        <option value="monthly">Mensal</option>
+        <option value="quarterly">Trimestral</option>
+        <option value="semi-annual">Semestral</option>
+        <option value="annual">Anual</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descrição (opcional)</label>
+      <textarea class="form-input" id="editDesc" rows="3"></textarea>
+    </div>
+    <button class="btn-primary" onclick="saveEdit()">Salvar alterações</button>
+    <button class="btn-secondary" onclick="closeAll()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const AREA_COLORS = {
+  "Ops & CS":       { bg:"#E8F4FD", border:"#2B7BB9", text:"#1a5a8a" },
+  "Legal":          { bg:"#FDF3E8", border:"#D4872B", text:"#9a5c0a" },
+  "Regulatory":     { bg:"#EDF7ED", border:"#2B9E2B", text:"#1a6e1a" },
+  "Tails":          { bg:"#F5EDF7", border:"#8B2BA8", text:"#5a1a72" },
+  "Controllership": { bg:"#FFF4F4", border:"#C0392B", text:"#7b1a1a" },
+  "Compliance":     { bg:"#FFFBEA", border:"#C9A800", text:"#7a6000" },
+  "ESG":            { bg:"#EDFAF3", border:"#16a34a", text:"#14532d" },
+};
+
+const BADGE = { monthly:"Mensal", quarterly:"Trimestral", "semi-annual":"Semestral", annual:"Anual" };
+const MONTHS_FULL  = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MONTHS_SHORT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const QUARTERS = ["Q1","Q2","Q3","Q4"];
+const WEEKDAYS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+
+let EVENTS = [
+  { id:1,  month:1,  day:31, area:"Regulatory",     label:"ANBIMA – Informe Mensal",                         recurrence:"monthly" },
+  { id:2,  month:1,  day:31, area:"Regulatory",     label:"CVM – Lâminas de Fundos",                         recurrence:"monthly" },
+  { id:3,  month:2,  day:15, area:"Ops & CS",       label:"Q4 Reports (prior year)",                         recurrence:"quarterly" },
+  { id:4,  month:2,  day:28, area:"Regulatory",     label:"BACEN – Capitais Estrangeiros" },
+  { id:5,  month:3,  day:15, area:"Legal",          label:"Q4 Legal Report",                                 recurrence:"quarterly" },
+  { id:6,  month:3,  day:31, area:"Ops & CS",       label:"Allocation Committee – Q1",                       recurrence:"quarterly" },
+  { id:7,  month:3,  day:31, area:"Regulatory",     label:"CVM – Informe Trimestral",                        recurrence:"quarterly" },
+  { id:8,  month:4,  day:15, area:"Ops & CS",       label:"Q1 Reports",                                      recurrence:"quarterly" },
+  { id:9,  month:4,  day:30, area:"Tails",          label:"Portco Budget Review – H1",                       recurrence:"semi-annual" },
+  { id:10, month:5,  day:15, area:"Legal",          label:"Q1 Legal Report",                                 recurrence:"quarterly" },
+  { id:11, month:5,  day:31, area:"Regulatory",     label:"ANBIMA – Informe Semestral",                      recurrence:"semi-annual" },
+  { id:12, month:6,  day:15, area:"Ops & CS",       label:"LPAC Meeting – H1",                               recurrence:"semi-annual" },
+  { id:13, month:6,  day:30, area:"Ops & CS",       label:"Allocation Committee – Q2",                       recurrence:"quarterly" },
+  { id:14, month:6,  day:30, area:"Regulatory",     label:"CVM – Informe Trimestral",                        recurrence:"quarterly" },
+  { id:15, month:6,  day:30, area:"Tails",          label:"Portco Board Meetings – Q2",                      recurrence:"quarterly" },
+  { id:16, month:7,  day:15, area:"Ops & CS",       label:"Q2 Reports",                                      recurrence:"quarterly" },
+  { id:17, month:7,  day:31, area:"Tails",          label:"KPIs Semestrais – Portcos" },
+  { id:18, month:8,  day:15, area:"Legal",          label:"Q2 Legal Report",                                 recurrence:"quarterly" },
+  { id:19, month:8,  day:31, area:"Regulatory",     label:"BACEN – Relatório Semestral",                     recurrence:"semi-annual" },
+  { id:20, month:9,  day:15, area:"Ops & CS",       label:"AGM Prep – Draft Materials" },
+  { id:21, month:9,  day:30, area:"Ops & CS",       label:"Allocation Committee – Q3",                       recurrence:"quarterly" },
+  { id:22, month:9,  day:30, area:"Regulatory",     label:"CVM – Informe Trimestral",                        recurrence:"quarterly" },
+  { id:23, month:10, day:15, area:"Ops & CS",       label:"Q3 Reports",                                      recurrence:"quarterly" },
+  { id:24, month:10, day:31, area:"Tails",          label:"Portco Budget Submission – FY+1",                 recurrence:"annual" },
+  { id:25, month:11, day:15, area:"Legal",          label:"Q3 Legal Report",                                 recurrence:"quarterly" },
+  { id:26, month:11, day:30, area:"Ops & CS",       label:"AGM – Annual General Meeting",                    recurrence:"annual" },
+  { id:27, month:12, day:15, area:"Ops & CS",       label:"LPAC Meeting – H2",                               recurrence:"semi-annual" },
+  { id:28, month:12, day:20, area:"Ops & CS",       label:"Audit – Year-End Kickoff",                        recurrence:"annual" },
+  { id:29, month:12, day:31, area:"Ops & CS",       label:"Allocation Committee – Q4",                       recurrence:"quarterly" },
+  { id:30, month:12, day:31, area:"Regulatory",     label:"CVM – Informe Trimestral",                        recurrence:"quarterly" },
+  { id:31, month:12, day:31, area:"Tails",          label:"Portco Board Meetings – Q4",                      recurrence:"quarterly" },
+  { id:32, month:3,  day:1,  area:"Legal",          label:"D&O: Renovação Apólice Global",                   recurrence:"annual" },
+  { id:33, month:3,  day:31, area:"Regulatory",     label:"CVM: Formulário de Referência",                   recurrence:"annual" },
+  { id:34, month:3,  day:31, area:"Regulatory",     label:"CVM: Declaração de Conformidade",                 recurrence:"annual" },
+  { id:35, month:2,  day:14, area:"Controllership", label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q4/25)", recurrence:"quarterly" },
+  { id:36, month:3,  day:31, area:"Controllership", label:"Bacen: Declaração Anual (DPA)",                   recurrence:"annual" },
+  { id:37, month:4,  day:14, area:"Controllership", label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q1/26)", recurrence:"quarterly" },
+  { id:38, month:4,  day:30, area:"Controllership", label:"JUCESP: Aprovação de Contas",                     recurrence:"annual" },
+  { id:39, month:6,  day:30, area:"Controllership", label:"Bacen: DPT Q1",                                   recurrence:"quarterly" },
+  { id:40, month:7,  day:14, area:"Controllership", label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q2/26)", recurrence:"quarterly" },
+  { id:41, month:9,  day:30, area:"Controllership", label:"Bacen: DPT Q2",                                   recurrence:"quarterly" },
+  { id:42, month:10, day:14, area:"Controllership", label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q3/26)", recurrence:"quarterly" },
+  { id:43, month:12, day:31, area:"Controllership", label:"Bacen: DPT Q3",                                   recurrence:"quarterly" },
+  { id:44, month:4,  day:30, area:"Compliance",     label:"CVM: Relatório LD/FTP para Alta Administração",   recurrence:"annual" },
+  { id:45, month:11, day:30, area:"Compliance",     label:"CVM: Treinamento Compliance",                     recurrence:"annual" },
+  { id:46, month:11, day:30, area:"Compliance",     label:"CVM/ANPD: Treinamento LGPD",                      recurrence:"annual" },
+  // ESG — Q1
+  { id:47, month:1,  day:31, area:"ESG", label:"ESG+I Annual Review: KPIs, Indicators & BP Prep", recurrence:"annual",     desc:"Consolidates: ESG+I KPIs (full year) · ESG+I Indicators (full year) · ESG+I BP Prep" },
+  { id:50, month:1,  day:31, area:"ESG", label:"Previous year audit (docs + interviews)",          recurrence:"annual" },
+  { id:51, month:2,  day:28, area:"ESG", label:"Annual Reports: Public & LPs",                     recurrence:"annual",     desc:"Consolidates: Public Annual Report · LPs Annual Report" },
+  { id:53, month:2,  day:28, area:"ESG", label:"WEP gap analysis report",                          recurrence:"annual" },
+  { id:54, month:2,  day:28, area:"ESG", label:"Yearly ESG+I Targets (PortCos)",                   recurrence:"annual" },
+  { id:55, month:2,  day:28, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  { id:56, month:3,  day:31, area:"ESG", label:"LPAC 1 · AGM",                                     recurrence:"semi-annual", desc:"Consolidates: LPAC 1 · AGM — both due end of March" },
+  { id:58, month:3,  day:31, area:"ESG", label:"Q1 questionnaire and score self assessment",       recurrence:"quarterly" },
+  // ESG — Q2
+  { id:60, month:4,  day:30, area:"ESG", label:"LPAC 1 · IADB ESG Report (F3)",                   recurrence:"semi-annual", desc:"Consolidates: LPAC 1 (follow-up) · IADB ESG Report (F3)" },
+  { id:62, month:5,  day:31, area:"ESG", label:"Morgan Stanley PES Impact Report",                 recurrence:"annual" },
+  { id:63, month:5,  day:31, area:"ESG", label:"Q2 ESG+I BP status review",                       recurrence:"quarterly" },
+  { id:64, month:5,  day:31, area:"ESG", label:"Q2 Data collect: GHG emission & Water",           recurrence:"semi-annual" },
+  { id:65, month:5,  day:31, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  { id:66, month:6,  day:30, area:"ESG", label:"Mid year ESG+I assessment & maturity scorecard",  recurrence:"semi-annual", desc:"Consolidates: ESG+I maturity scorecard · Mid year ESG+I assessment (doc based)" },
+  { id:67, month:6,  day:30, area:"ESG", label:"PRI Questionnaire / Report",                       recurrence:"annual" },
+  { id:68, month:6,  day:30, area:"ESG", label:"Q2 PortCo's targets review",                      recurrence:"quarterly" },
+  { id:69, month:6,  day:30, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  // ESG — Q3
+  { id:71, month:7,  day:31, area:"ESG", label:"ESG+I Mid year: KPIs & Indicators",               recurrence:"semi-annual", desc:"Consolidates: ESG+I KPIs (mid year) · ESG+I Indicators (mid year)" },
+  { id:73, month:7,  day:31, area:"ESG", label:"Q3 ESG+I BP status review",                       recurrence:"quarterly" },
+  { id:74, month:7,  day:31, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  { id:75, month:8,  day:31, area:"ESG", label:"LPAC 2",                                           recurrence:"semi-annual" },
+  { id:76, month:8,  day:31, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  { id:77, month:9,  day:30, area:"ESG", label:"LPAC 2 · Q3 questionnaire and score self assessment", recurrence:"quarterly", desc:"Consolidates: LPAC 2 (follow-up) · Q3 questionnaire and score self assessment" },
+  { id:79, month:9,  day:30, area:"ESG", label:"Q3 PortCo's targets review",                      recurrence:"quarterly" },
+  { id:80, month:9,  day:30, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  // ESG — Q4
+  { id:81, month:10, day:31, area:"ESG", label:"ESG+I maturity scorecard",                         recurrence:"semi-annual" },
+  { id:82, month:10, day:31, area:"ESG", label:"OPIM Disclosure Statement & Verification",         recurrence:"annual",     desc:"Consolidates: OPIM Disclosure Statement · OPIM Disclosure and verification" },
+  { id:83, month:10, day:31, area:"ESG", label:"Cerity ESG questionnaire",                         recurrence:"annual" },
+  { id:84, month:10, day:31, area:"ESG", label:"Q4 Data collect: GHG emission & Water",           recurrence:"semi-annual" },
+  { id:85, month:10, day:31, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  { id:87, month:11, day:30, area:"ESG", label:"Full year audit (docs + interviews)",              recurrence:"annual" },
+  { id:88, month:11, day:30, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+  { id:89, month:12, day:31, area:"ESG", label:"Q4 PortCo's targets review & ESG+I BP status review", recurrence:"quarterly", desc:"Consolidates: Q4 PortCo's targets review · Q4 ESG+I BP status review" },
+  { id:90, month:12, day:31, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
+];
+
+let nextId = 200;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const today = new Date();
+let state = {
+  view: 'year',
+  activeAreas: new Set(),
+  activeQ: Math.floor(today.getMonth() / 3),
+  viewMonth: today.getMonth(),
+  viewYear: today.getFullYear(),
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function init() {
+  // Today pill
+  document.getElementById('todayText').textContent =
+    today.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  buildFilters();
+  buildLegend();
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function buildFilters() {
+  if (!state.activeAreas) state.activeAreas = new Set();
+  const areas = Object.keys(AREA_COLORS);
+  const el = document.getElementById('filterGroup');
+  const allActive = state.activeAreas.size === 0;
+
+  // "All" button
+  const allStyle = allActive ? 'border-color:#0f172a;background:#0f172a;color:#fff;font-weight:700' : '';
+  let html = `<button class="filter-btn${allActive?' active':''}" style="${allStyle}" onclick="clearFilters()">Todas as áreas</button>`;
+
+  html += areas.map(a => {
+    const c = AREA_COLORS[a];
+    const active = state.activeAreas.has(a);
+    const style = active ? `border-color:${c.border};background:${c.bg};color:${c.text};font-weight:700` : '';
+    return `<button class="filter-btn${active?' active':''}" style="${style}" onclick="toggleArea('${a}')">${a}</button>`;
+  }).join('');
+
+  el.innerHTML = html;
+}
+
+function buildLegend() {
+  const el = document.getElementById('legend');
+  const items = Object.entries(AREA_COLORS).map(([area, c]) =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${c.border}"></div><span class="legend-text">${area}</span></div>`
+  ).join('');
+  const recurs = Object.entries(BADGE).map(([,v]) =>
+    `<span class="recur-badge">${v}</span>`
+  ).join('');
+  el.innerHTML = `<span class="legend-label">Áreas:</span>${items}<div class="legend-recur">${recurs}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function setView(v) {
+  state.view = v;
+  // sync activeQ to current month when switching
+  if (v === 'quarter' || v === 'month') state.activeQ = Math.floor(state.viewMonth / 3);
+  render();
+}
+
+function setQ(q) {
+  state.activeQ = q;
+  if (state.view === 'month') state.viewMonth = q * 3;
+  render();
+}
+
+function toggleArea(a) {
+  if (state.activeAreas.has(a)) {
+    state.activeAreas.delete(a);
+  } else {
+    state.activeAreas.add(a);
+  }
+  buildFilters();
+  render();
+}
+
+function clearFilters() {
+  state.activeAreas.clear();
+  buildFilters();
+  render();
+}
+
+function navMonth(d) {
+  state.viewMonth += d;
+  if (state.viewMonth > 11) { state.viewMonth = 0; state.viewYear++; }
+  if (state.viewMonth < 0)  { state.viewMonth = 11; state.viewYear--; }
+  state.activeQ = Math.floor(state.viewMonth / 3);
+  render();
+}
+
+function jumpToday() {
+  state.viewMonth = today.getMonth();
+  state.viewYear  = today.getFullYear();
+  state.activeQ   = Math.floor(today.getMonth() / 3);
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function render() {
+  const { view, activeQ, viewMonth } = state;
+  const filtered = EVENTS.filter(e => !state.activeAreas || state.activeAreas.size === 0 || state.activeAreas.has(e.area));
+
+  // Count
+  document.getElementById('subCount').textContent =
+    `${filtered.length} entrega${filtered.length !== 1 ? 's' : ''} · Cross-áreas · 2026`;
+
+  // View buttons
+  ['month','quarter','year'].forEach(v => {
+    document.getElementById(`vbtn-${v}`).classList.toggle('active', view === v);
+  });
+
+  // Quarter tabs
+  const showQtabs = view === 'quarter' || view === 'month';
+  document.getElementById('quarterTabs').style.display = showQtabs ? 'flex' : 'none';
+  if (showQtabs) {
+    [0,1,2,3].forEach(i => document.getElementById(`qtab-${i}`).classList.toggle('active', i === activeQ));
+  }
+
+  // Month nav
+  document.getElementById('monthNav').style.display = view === 'month' ? 'flex' : 'none';
+  if (view === 'month') {
+    document.getElementById('monthNavTitle').textContent =
+      `${MONTHS_FULL[state.viewMonth]} ${state.viewYear}`;
+  }
+
+  // Grid
+  const grid = document.getElementById('calGrid');
+  grid.className = `cal-grid ${view}`;
+
+  let monthsToShow;
+  if (view === 'year')    monthsToShow = Array.from({length:12}, (_,i) => i);
+  else if (view === 'quarter') monthsToShow = [activeQ*3, activeQ*3+1, activeQ*3+2];
+  else                    monthsToShow = [state.viewMonth];
+
+  grid.innerHTML = monthsToShow.map(mi => renderMonthCard(mi, filtered, view)).join('');
+}
+
+function renderMonthCard(mi, filtered, view) {
+  const evs = filtered.filter(e => e.month === mi + 1).sort((a, b) => a.day - b.day);
+  const isCurrent = mi === today.getMonth() && state.viewYear === today.getFullYear();
+  const qLabel = QUARTERS[Math.floor(mi / 3)];
+  const nameClass = view === 'month' ? 'large' : 'small';
+
+  if (view === 'month') {
+    return renderMonthFull(mi, filtered, isCurrent);
+  }
+
+  const header = `
+    <div class="month-header">
+      <span class="month-name ${nameClass}">${view === 'year' ? MONTHS_SHORT[mi] : MONTHS_FULL[mi]}</span>
+      <div class="month-header-right">
+        ${evs.length > 0 ? `<span class="event-count">${evs.length}</span>` : ''}
+        <span class="q-badge">${qLabel}</span>
+      </div>
+    </div>`;
+
+  const body = evs.length === 0
+    ? `<div class="events-list"><div class="empty-month">—</div></div>`
+    : `<div class="events-list">${evs.map(ev => renderEventRow(ev)).join('')}</div>`;
+
+  return `<div class="month-card${isCurrent ? ' is-current' : ''}">${header}${body}</div>`;
+}
+
+function renderEventRow(ev) {
+  const c = AREA_COLORS[ev.area] || { bg:'#f1f5f9', border:'#94a3b8', text:'#475569' };
+  return `
+    <div class="event-row" style="background:${c.bg};border-left:3px solid ${c.border}"
+         onclick='showDetail(${ev.id})'>
+      <span class="event-day" style="color:${c.text}">${ev.day}</span>
+      <div class="event-body">
+        <div class="event-label">${ev.label}</div>
+        <div class="event-tags">
+          <span class="tag-area" style="background:${c.border}">${ev.area}</span>
+          ${ev.recurrence ? `<span class="tag-recur">${BADGE[ev.recurrence]||''}</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderMonthFull(mi, filtered, isCurrent) {
+  const year  = state.viewYear;
+  const evs   = filtered.filter(e => e.month === mi + 1);
+  const first = new Date(year, mi, 1).getDay();
+  const total = new Date(year, mi + 1, 0).getDate();
+  const prevT = new Date(year, mi, 0).getDate();
+  const qLabel = QUARTERS[Math.floor(mi / 3)];
+
+  const header = `
+    <div class="month-header">
+      <span class="month-name large">${MONTHS_FULL[mi]} ${year}</span>
+      <div class="month-header-right">
+        ${evs.length > 0 ? `<span class="event-count">${evs.length}</span>` : ''}
+        <span class="q-badge">${qLabel}</span>
+      </div>
+    </div>`;
+
+  const weekdaysRow = `<div class="cal-weekdays">${WEEKDAYS.map(d => `<div class="cal-weekday">${d}</div>`).join('')}</div>`;
+
+  let cells = [];
+  for (let i = first - 1; i >= 0; i--) cells.push({ day: prevT - i, cur: false });
+  for (let i = 1; i <= total; i++)      cells.push({ day: i, cur: true });
+  while (cells.length % 7)              cells.push({ day: cells.length - total - first + 1, cur: false });
+
+  const daysGrid = cells.map(({ day, cur }) => {
+    const dow = new Date(year, mi, cur ? day : 1).getDay();
+    const isToday = cur && day === today.getDate() && mi === today.getMonth() && year === today.getFullYear();
+    const isWknd  = dow === 0 || dow === 6;
+    const dateEvs = cur ? evs.filter(e => e.day === day).sort((a,b) => a.day - b.day) : [];
+    const show    = dateEvs.slice(0, 3);
+    const rest    = dateEvs.length - show.length;
+
+    const cls = ['cal-cell', !cur && 'other-month', isToday && 'today-cell', isWknd && 'weekend-cell'].filter(Boolean).join(' ');
+    const numEl = `<div class="cell-day-num">${day}</div>`;
+    const pills = show.map(ev => {
+      const c = AREA_COLORS[ev.area] || { bg:'#f1f5f9', border:'#94a3b8', text:'#475569' };
+      return `<div class="cell-event" style="background:${c.bg};color:${c.text};border-left-color:${c.border}" onclick='showDetail(${ev.id})' title="${ev.label}">${ev.label}</div>`;
+    }).join('');
+    const moreBadge = rest > 0 ? `<div class="cell-more">+${rest} mais</div>` : '';
+
+    return `<div class="${cls}">${numEl}${pills}${moreBadge}</div>`;
+  }).join('');
+
+  return `<div class="month-card${isCurrent ? ' is-current' : ''}">
+    ${header}${weekdaysRow}
+    <div class="cal-days">${daysGrid}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MODALS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+let currentEventId = null;
+
+function showDetail(id) {
+  const ev = EVENTS.find(e => e.id === id);
+  if (!ev) return;
+  currentEventId = id;
+  const c = AREA_COLORS[ev.area] || { bg:'#f1f5f9', border:'#94a3b8', text:'#475569' };
+
+  document.getElementById('dAreaBadge').style.cssText = `background:${c.bg};color:${c.text};border:1.5px solid ${c.border}`;
+  document.getElementById('dAreaBadge').innerHTML =
+    `<div style="width:8px;height:8px;border-radius:50%;background:${c.border}"></div>${ev.area}`;
+  document.getElementById('dTitle').textContent = ev.label;
+  document.getElementById('dDate').innerHTML =
+    `📅 ${ev.day} de ${MONTHS_FULL[ev.month - 1]}${ev.recurrence ? ` &nbsp;·&nbsp; ${BADGE[ev.recurrence]}` : ''}`;
+  document.getElementById('dDesc').textContent = ev.desc || 'Sem descrição adicional.';
+
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function openEdit() {
+  const ev = EVENTS.find(e => e.id === currentEventId);
+  if (!ev) return;
+  document.getElementById('editTitle').value = ev.label;
+  document.getElementById('editMonth').value = ev.month;
+  document.getElementById('editDay').value   = ev.day;
+  document.getElementById('editArea').value  = ev.area;
+  document.getElementById('editRecur').value = ev.recurrence || '';
+  document.getElementById('editDesc').value  = ev.desc || '';
+  document.getElementById('detailOverlay').classList.remove('open');
+  document.getElementById('editOverlay').classList.add('open');
+}
+
+function saveEdit() {
+  const idx = EVENTS.findIndex(e => e.id === currentEventId);
+  if (idx === -1) return;
+  const title = document.getElementById('editTitle').value.trim();
+  const month = parseInt(document.getElementById('editMonth').value);
+  const day   = parseInt(document.getElementById('editDay').value);
+  const area  = document.getElementById('editArea').value;
+  const recur = document.getElementById('editRecur').value;
+  const desc  = document.getElementById('editDesc').value.trim();
+  if (!title || !day) { alert('Preencha título e dia.'); return; }
+  EVENTS[idx] = { ...EVENTS[idx], label: title, month, day, area, recurrence: recur || undefined, desc };
+  closeAll();
+  render();
+}
+
+function deleteEvent() {
+  if (!confirm('Deletar este evento?')) return;
+  EVENTS = EVENTS.filter(e => e.id !== currentEventId);
+  closeAll();
+  render();
+}
+
+function openAdd() {
+  const d = new Date().toISOString().split('T')[0];
+  document.getElementById('evTitle').value = '';
+  document.getElementById('evStart').value = d;
+  document.getElementById('evEnd').value   = d;
+  document.getElementById('evDesc').value  = '';
+  document.getElementById('evRecur').value = '';
+  document.getElementById('addOverlay').classList.add('open');
+}
+
+function addEvent() {
+  const title = document.getElementById('evTitle').value.trim();
+  const start = document.getElementById('evStart').value;
+  const area  = document.getElementById('evArea').value;
+  const recur = document.getElementById('evRecur').value;
+  const desc  = document.getElementById('evDesc').value.trim();
+  if (!title || !start) { alert('Preencha título e data.'); return; }
+  const [,m,d] = start.split('-').map(Number);
+  EVENTS.push({ id: nextId++, month: m, day: d, area, label: title, recurrence: recur || undefined, desc });
+  closeAll();
+  render();
+}
+
+function closeAll() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  document.getElementById('addOverlay').classList.remove('open');
+  document.getElementById('editOverlay').classList.remove('open');
+}
+
+function closeOnBg(e, id) {
+  if (e.target.id === id) closeAll();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function exportHTML() {
+  const src    = document.documentElement.outerHTML;
+  const marker = 'let EVENTS = ';
+  const start  = src.indexOf(marker) + marker.length;
+  const end    = src.indexOf(';\n\nlet nextId', start) + 2;
+  const updated = src.slice(0, start) + JSON.stringify(EVENTS, null, 2) + ';\n' + src.slice(end);
+  const blob = new Blob([updated], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'aqua-calendario-ops.html';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
