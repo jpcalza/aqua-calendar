@@ -77,7 +77,7 @@ body {
 }
 .q-tab.active { border-color: #2B7BB9; background: #2B7BB9; color: #fff; }
 
-/* ── MONTH NAVIGATION (for monthly view) ── */
+/* ── MONTH NAVIGATION ── */
 .month-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
 .month-nav-btn {
   width: 36px; height: 36px; border-radius: 50%; border: 2px solid #e2e8f0;
@@ -95,10 +95,7 @@ body {
 .today-jump:hover { border-color: #2B7BB9; color: #2B7BB9; }
 
 /* ── CALENDAR GRID ── */
-.cal-grid {
-  display: grid;
-  gap: 12px;
-}
+.cal-grid { display: grid; gap: 12px; }
 .cal-grid.year  { grid-template-columns: repeat(4, 1fr); }
 .cal-grid.quarter { grid-template-columns: repeat(3, 1fr); }
 .cal-grid.month { grid-template-columns: 1fr; }
@@ -127,12 +124,8 @@ body {
 .q-badge { font-size: 10px; color: #cbd5e1; font-weight: 500; }
 
 /* ── MONTHLY CALENDAR VIEW ── */
-.cal-weekdays {
-  display: grid; grid-template-columns: repeat(7, 1fr);
-  padding: 8px 10px 4px;
-}
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 8px 10px 4px; }
 .cal-weekday { text-align: center; font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 0; }
-
 .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 10px 10px; gap: 2px; }
 .cal-cell {
   min-height: 90px; border-radius: 8px; padding: 6px 5px;
@@ -143,7 +136,6 @@ body {
 .cal-cell.other-month { opacity: 0.3; }
 .cal-cell.today-cell { background: #EEF2FF; border-color: #c7d2fe; }
 .cal-cell.weekend-cell .cell-day-num { color: #94a3b8; }
-
 .cell-day-num {
   font-size: 12px; font-weight: 600; color: #334155; line-height: 1;
   margin-bottom: 2px; width: 22px; text-align: center;
@@ -153,7 +145,6 @@ body {
   width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
   font-size: 11px;
 }
-
 .cell-event {
   font-size: 9.5px; font-weight: 500; padding: 2px 5px; border-radius: 4px;
   line-height: 1.3; cursor: pointer; white-space: nowrap;
@@ -164,28 +155,19 @@ body {
 .cell-more { font-size: 9px; color: #94a3b8; font-weight: 500; padding: 1px 4px; cursor: pointer; }
 .cell-more:hover { color: #4338ca; }
 
-/* ── EVENT LIST (year/quarter views) ── */
+/* ── EVENT LIST ── */
 .events-list { padding: 8px 10px; min-height: 80px; }
-
 .event-row {
   display: flex; gap: 7px; padding: 5px 7px; border-radius: 7px;
   margin-bottom: 4px; cursor: pointer; transition: opacity 0.15s;
 }
 .event-row:hover { opacity: 0.85; }
-
 .event-day { font-size: 10px; font-weight: 700; min-width: 20px; padding-top: 1px; }
 .event-body { flex: 1; }
 .event-label { font-size: 11px; color: #1e293b; font-weight: 500; line-height: 1.35; }
 .event-tags { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
-.tag-area {
-  font-size: 9px; color: #fff; border-radius: 3px;
-  padding: 1px 5px; font-weight: 600;
-}
-.tag-recur {
-  font-size: 9px; background: #f1f5f9; color: #94a3b8;
-  border-radius: 3px; padding: 1px 5px;
-}
-
+.tag-area { font-size: 9px; color: #fff; border-radius: 3px; padding: 1px 5px; font-weight: 600; }
+.tag-recur { font-size: 9px; background: #f1f5f9; color: #94a3b8; border-radius: 3px; padding: 1px 5px; }
 .empty-month { color: #e2e8f0; font-size: 11px; text-align: center; padding: 20px 0; }
 
 /* ── MODAL ── */
@@ -196,7 +178,6 @@ body {
   opacity: 0; pointer-events: none; transition: opacity 0.2s;
 }
 .overlay.open { opacity: 1; pointer-events: all; }
-
 .modal {
   background: #fff; border-radius: 16px; padding: 28px;
   width: 440px; max-width: 92vw; max-height: 90vh; overflow-y: auto;
@@ -204,25 +185,22 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,0.2); position: relative;
 }
 .overlay.open .modal { transform: translateY(0); }
-
 .modal-close {
   position: absolute; top: 14px; right: 16px;
   background: none; border: none; font-size: 20px;
   color: #94a3b8; cursor: pointer; line-height: 1;
 }
 .modal-close:hover { color: #334155; }
-
 .modal-area-badge {
   display: inline-flex; align-items: center; gap: 5px;
   font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.1em; margin-bottom: 10px; padding: 3px 8px;
-  border-radius: 4px;
+  letter-spacing: 0.1em; margin-bottom: 10px; padding: 3px 8px; border-radius: 4px;
 }
 .modal-title { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 6px; line-height: 1.3; }
 .modal-date { font-size: 13px; color: #64748b; margin-bottom: 16px; }
 .modal-desc { font-size: 14px; color: #475569; line-height: 1.6; border-top: 1px solid #f1f5f9; padding-top: 14px; }
 
-/* ── ADD FORM ── */
+/* ── FORM ── */
 .form-group { margin-bottom: 14px; }
 .form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 5px; display: block; }
 .form-input {
@@ -232,7 +210,6 @@ body {
 }
 .form-input:focus { border-color: #2B7BB9; background: #fff; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
 .btn-primary {
   width: 100%; padding: 11px; background: #2B7BB9; color: #fff; border: none;
   border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600;
@@ -245,7 +222,6 @@ body {
   cursor: pointer; transition: background 0.15s; margin-top: 6px;
 }
 .btn-secondary:hover { background: #e2e8f0; }
-
 .add-event-btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 7px 16px; border-radius: 20px; cursor: pointer;
@@ -254,6 +230,30 @@ body {
   transition: all 0.15s;
 }
 .add-event-btn:hover { background: #e0e7ff; border-color: #a5b4fc; }
+
+/* ── SYNC BUTTON ── */
+.sync-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 16px; border-radius: 20px; cursor: pointer;
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  background: #EDFAF3; border: 2px solid #86efac; color: #16a34a;
+  transition: all 0.15s;
+}
+.sync-btn:hover { background: #dcfce7; border-color: #4ade80; }
+.sync-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.sync-btn.syncing { animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* ── SYNC STATUS TOAST ── */
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 999;
+  padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15); transform: translateY(80px);
+  transition: transform 0.3s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); }
+.toast.success { background: #EDFAF3; color: #16a34a; border: 1.5px solid #86efac; }
+.toast.error   { background: #FFF4F4; color: #C0392B; border: 1.5px solid #fca5a5; }
 
 /* ── LEGEND ── */
 .legend { margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; border-top: 1px solid #e2e8f0; padding-top: 16px; }
@@ -264,61 +264,33 @@ body {
 .legend-recur { margin-left: auto; display: flex; gap: 10px; align-items: center; }
 .recur-badge { font-size: 9px; background: #f1f5f9; color: #64748b; border-radius: 3px; padding: 2px 6px; font-weight: 500; }
 
-/* ── INSTRUCTIONS ── */
-.instructions {
-  margin-top: 24px; background: #fff; border: 1px solid #e2e8f0;
-  border-radius: 12px; padding: 18px 20px;
-}
-.instructions-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #2B7BB9; margin-bottom: 10px; }
-.instructions p { font-size: 13px; color: #64748b; line-height: 1.7; }
-.instructions code { background: #EEF2FF; color: #4338ca; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
-
 @media (max-width: 900px) {
   .cal-grid.year    { grid-template-columns: repeat(2, 1fr); }
   .cal-grid.quarter { grid-template-columns: 1fr; }
 }
-
 @media (max-width: 600px) {
   .app { padding: 16px 12px 48px; }
-
   .header-title { font-size: 18px; }
-  .header-eyebrow { font-size: 10px; }
-  .today-pill { font-size: 11px; padding: 3px 10px; }
-
   .controls { flex-direction: column; align-items: stretch; gap: 10px; }
   .filter-group { gap: 5px; }
   .filter-btn { font-size: 11px; padding: 4px 10px; }
-  .add-event-btn { justify-content: center; }
+  .add-event-btn, .sync-btn { justify-content: center; }
   .view-toggle { align-self: flex-end; }
-
   .quarter-tabs { gap: 6px; }
   .q-tab { padding: 6px 14px; font-size: 12px; }
-
   .month-nav-title { font-size: 16px; }
-
-  .cal-grid.year    { grid-template-columns: 1fr; }
-  .cal-grid.quarter { grid-template-columns: 1fr; }
-  .cal-grid.month   { grid-template-columns: 1fr; }
-
+  .cal-grid.year, .cal-grid.quarter, .cal-grid.month { grid-template-columns: 1fr; }
   .cal-cell { min-height: 64px; padding: 4px 3px; }
   .cell-day-num { font-size: 11px; width: 18px; }
   .today-cell .cell-day-num { width: 18px; height: 18px; font-size: 10px; }
   .cell-event { font-size: 8.5px; padding: 1px 3px; }
-
-  .event-row { padding: 4px 6px; }
-  .event-label { font-size: 10px; }
-  .tag-area, .tag-recur { font-size: 8px; }
-
   .modal { padding: 20px 16px; border-radius: 12px; }
   .modal-title { font-size: 17px; }
   .form-row { grid-template-columns: 1fr; }
-
   .legend-recur { display: none; }
   .legend { gap: 10px; }
   .legend-text { font-size: 10px; }
-
-  .instructions { padding: 14px 16px; }
-  .instructions p { font-size: 12px; }
+  .toast { bottom: 16px; right: 16px; left: 16px; }
 }
 </style>
 </head>
@@ -343,14 +315,15 @@ body {
   <div class="controls">
     <div class="filter-group" id="filterGroup"></div>
     <button class="add-event-btn" onclick="openAdd()">＋ Novo Evento</button>
+    <button class="sync-btn" id="syncBtn" onclick="syncToGitHub()">☁️ Sync GitHub</button>
     <div class="view-toggle">
-      <button class="view-btn" id="vbtn-month"  onclick="setView('month')">Mês</button>
+      <button class="view-btn" id="vbtn-month"   onclick="setView('month')">Mês</button>
       <button class="view-btn" id="vbtn-quarter" onclick="setView('quarter')">Trimestre</button>
-      <button class="view-btn" id="vbtn-year"   onclick="setView('year')">Ano</button>
+      <button class="view-btn" id="vbtn-year"    onclick="setView('year')">Ano</button>
     </div>
   </div>
 
-  <!-- QUARTER TABS (shown in quarter/month view) -->
+  <!-- QUARTER TABS -->
   <div class="quarter-tabs" id="quarterTabs" style="display:none">
     <button class="q-tab" id="qtab-0" onclick="setQ(0)">Q1</button>
     <button class="q-tab" id="qtab-1" onclick="setQ(1)">Q2</button>
@@ -358,7 +331,7 @@ body {
     <button class="q-tab" id="qtab-3" onclick="setQ(3)">Q4</button>
   </div>
 
-  <!-- MONTH NAV (shown in month view) -->
+  <!-- MONTH NAV -->
   <div class="month-nav" id="monthNav" style="display:none">
     <button class="month-nav-btn" onclick="navMonth(-1)">‹</button>
     <div class="month-nav-title" id="monthNavTitle"></div>
@@ -372,9 +345,10 @@ body {
   <!-- LEGEND -->
   <div class="legend" id="legend"></div>
 
-  
-
 </div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <!-- DETAIL MODAL -->
 <div class="overlay" id="detailOverlay" onclick="closeOnBg(event,'detailOverlay')">
@@ -396,7 +370,6 @@ body {
   <div class="modal" style="width:460px">
     <button class="modal-close" onclick="closeAll()">×</button>
     <div class="modal-title" style="margin-bottom:20px">Novo Evento</div>
-
     <div class="form-group">
       <label class="form-label">Título</label>
       <input class="form-input" type="text" id="evTitle" placeholder="Ex: Board Meeting – Portco X">
@@ -447,7 +420,6 @@ body {
   <div class="modal" style="width:460px">
     <button class="modal-close" onclick="closeAll()">×</button>
     <div class="modal-title" style="margin-bottom:20px">Editar Evento</div>
-
     <div class="form-group">
       <label class="form-label">Título</label>
       <input class="form-input" type="text" id="editTitle">
@@ -500,11 +472,35 @@ body {
   </div>
 </div>
 
+<!-- GITHUB TOKEN MODAL -->
+<div class="overlay" id="tokenOverlay" onclick="closeOnBg(event,'tokenOverlay')">
+  <div class="modal" style="width:460px">
+    <button class="modal-close" onclick="closeAll()">×</button>
+    <div class="modal-title" style="margin-bottom:8px">🔑 GitHub Token</div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px">
+      Cole seu GitHub Personal Access Token abaixo. Ele será salvo <strong>apenas no seu navegador</strong> (localStorage) e nunca enviado para nenhum servidor além do GitHub.
+    </p>
+    <div class="form-group">
+      <label class="form-label">Personal Access Token</label>
+      <input class="form-input" type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    </div>
+    <button class="btn-primary" onclick="saveToken()">Salvar Token</button>
+    <button class="btn-secondary" onclick="closeAll()">Cancelar</button>
+  </div>
+</div>
+
 <script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// GITHUB CONFIG
+// ═══════════════════════════════════════════════════════════════════════════════
+const GH_OWNER = 'jpcalza';
+const GH_REPO  = 'aqua-calendar';
+const GH_FILE  = 'events.json';
+const GH_BRANCH = 'main';
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════════════════════════════════════════
-
 const AREA_COLORS = {
   "Ops & CS":       { bg:"#E8F4FD", border:"#2B7BB9", text:"#1a5a8a" },
   "Legal":          { bg:"#FDF3E8", border:"#D4872B", text:"#9a5c0a" },
@@ -513,6 +509,16 @@ const AREA_COLORS = {
   "Controllership": { bg:"#FFF4F4", border:"#C0392B", text:"#7b1a1a" },
   "Compliance":     { bg:"#FFFBEA", border:"#C9A800", text:"#7a6000" },
   "ESG":            { bg:"#EDFAF3", border:"#16a34a", text:"#14532d" },
+};
+
+const AREA_EMAILS = {
+  "Ops & CS":       "jpc@aqua.capital",
+  "Legal":          "jpc@aqua.capital",
+  "Regulatory":     "jpc@aqua.capital",
+  "Tails":          "jpc@aqua.capital",
+  "Controllership": "jpc@aqua.capital",
+  "Compliance":     "jpc@aqua.capital",
+  "ESG":            "jpc@aqua.capital"
 };
 
 const BADGE = { monthly:"Mensal", quarterly:"Trimestral", "semi-annual":"Semestral", annual:"Anual" };
@@ -568,16 +574,14 @@ let EVENTS = [
   { id:44, month:4,  day:30, area:"Compliance",     label:"CVM: Relatório LD/FTP para Alta Administração",   recurrence:"annual" },
   { id:45, month:11, day:30, area:"Compliance",     label:"CVM: Treinamento Compliance",                     recurrence:"annual" },
   { id:46, month:11, day:30, area:"Compliance",     label:"CVM/ANPD: Treinamento LGPD",                      recurrence:"annual" },
-  // ESG — Q1
-  { id:47, month:1,  day:31, area:"ESG", label:"ESG+I Annual Review: KPIs, Indicators & BP Prep", recurrence:"annual",     desc:"Consolidates: ESG+I KPIs (full year) · ESG+I Indicators (full year) · ESG+I BP Prep" },
+  { id:47, month:1,  day:31, area:"ESG", label:"ESG+I Annual Review: KPIs, Indicators & BP Prep", recurrence:"annual",      desc:"Consolidates: ESG+I KPIs (full year) · ESG+I Indicators (full year) · ESG+I BP Prep" },
   { id:50, month:1,  day:31, area:"ESG", label:"Previous year audit (docs + interviews)",          recurrence:"annual" },
-  { id:51, month:2,  day:28, area:"ESG", label:"Annual Reports: Public & LPs",                     recurrence:"annual",     desc:"Consolidates: Public Annual Report · LPs Annual Report" },
+  { id:51, month:2,  day:28, area:"ESG", label:"Annual Reports: Public & LPs",                     recurrence:"annual",      desc:"Consolidates: Public Annual Report · LPs Annual Report" },
   { id:53, month:2,  day:28, area:"ESG", label:"WEP gap analysis report",                          recurrence:"annual" },
   { id:54, month:2,  day:28, area:"ESG", label:"Yearly ESG+I Targets (PortCos)",                   recurrence:"annual" },
   { id:55, month:2,  day:28, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
   { id:56, month:3,  day:31, area:"ESG", label:"LPAC 1 · AGM",                                     recurrence:"semi-annual", desc:"Consolidates: LPAC 1 · AGM — both due end of March" },
   { id:58, month:3,  day:31, area:"ESG", label:"Q1 questionnaire and score self assessment",       recurrence:"quarterly" },
-  // ESG — Q2
   { id:60, month:4,  day:30, area:"ESG", label:"LPAC 1 · IADB ESG Report (F3)",                   recurrence:"semi-annual", desc:"Consolidates: LPAC 1 (follow-up) · IADB ESG Report (F3)" },
   { id:62, month:5,  day:31, area:"ESG", label:"Morgan Stanley PES Impact Report",                 recurrence:"annual" },
   { id:63, month:5,  day:31, area:"ESG", label:"Q2 ESG+I BP status review",                       recurrence:"quarterly" },
@@ -587,7 +591,6 @@ let EVENTS = [
   { id:67, month:6,  day:30, area:"ESG", label:"PRI Questionnaire / Report",                       recurrence:"annual" },
   { id:68, month:6,  day:30, area:"ESG", label:"Q2 PortCo's targets review",                      recurrence:"quarterly" },
   { id:69, month:6,  day:30, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
-  // ESG — Q3
   { id:71, month:7,  day:31, area:"ESG", label:"ESG+I Mid year: KPIs & Indicators",               recurrence:"semi-annual", desc:"Consolidates: ESG+I KPIs (mid year) · ESG+I Indicators (mid year)" },
   { id:73, month:7,  day:31, area:"ESG", label:"Q3 ESG+I BP status review",                       recurrence:"quarterly" },
   { id:74, month:7,  day:31, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
@@ -596,9 +599,8 @@ let EVENTS = [
   { id:77, month:9,  day:30, area:"ESG", label:"LPAC 2 · Q3 questionnaire and score self assessment", recurrence:"quarterly", desc:"Consolidates: LPAC 2 (follow-up) · Q3 questionnaire and score self assessment" },
   { id:79, month:9,  day:30, area:"ESG", label:"Q3 PortCo's targets review",                      recurrence:"quarterly" },
   { id:80, month:9,  day:30, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
-  // ESG — Q4
   { id:81, month:10, day:31, area:"ESG", label:"ESG+I maturity scorecard",                         recurrence:"semi-annual" },
-  { id:82, month:10, day:31, area:"ESG", label:"OPIM Disclosure Statement & Verification",         recurrence:"annual",     desc:"Consolidates: OPIM Disclosure Statement · OPIM Disclosure and verification" },
+  { id:82, month:10, day:31, area:"ESG", label:"OPIM Disclosure Statement & Verification",         recurrence:"annual",      desc:"Consolidates: OPIM Disclosure Statement · OPIM Disclosure and verification" },
   { id:83, month:10, day:31, area:"ESG", label:"Cerity ESG questionnaire",                         recurrence:"annual" },
   { id:84, month:10, day:31, area:"ESG", label:"Q4 Data collect: GHG emission & Water",           recurrence:"semi-annual" },
   { id:85, month:10, day:31, area:"ESG", label:"Progress: positive impact projects",               recurrence:"monthly" },
@@ -613,7 +615,6 @@ let nextId = 200;
 // ═══════════════════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════════════════
-
 const today = new Date();
 let state = {
   view: 'year',
@@ -624,40 +625,147 @@ let state = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// INIT
+// GITHUB SYNC
 // ═══════════════════════════════════════════════════════════════════════════════
 
+function getToken() {
+  return localStorage.getItem('gh_token_aqua');
+}
+
+function saveToken() {
+  const val = document.getElementById('ghTokenInput').value.trim();
+  if (!val) { alert('Cole o token primeiro.'); return; }
+  localStorage.setItem('gh_token_aqua', val);
+  closeAll();
+  showToast('✅ Token salvo! Clique em Sync GitHub para sincronizar.', 'success');
+}
+
+async function syncToGitHub() {
+  const token = getToken();
+  if (!token) {
+    document.getElementById('tokenOverlay').classList.add('open');
+    return;
+  }
+
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = true;
+  btn.classList.add('syncing');
+  btn.textContent = '⏳ Sincronizando...';
+
+  try {
+    // 1. Buscar SHA atual do arquivo
+    const shaRes = await fetch(
+      `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?ref=${GH_BRANCH}`,
+      { headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github+json' } }
+    );
+
+    let sha = null;
+    if (shaRes.ok) {
+      const shaData = await shaRes.json();
+      sha = shaData.sha;
+    }
+
+    // 2. Montar o JSON atualizado
+    const payload = {
+      year: 2026,
+      areas: Object.fromEntries(
+        Object.entries(AREA_EMAILS).map(([area, email]) => [area, { email }])
+      ),
+      events: EVENTS
+    };
+
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+
+    // 3. Fazer o commit via API
+    const body = {
+      message: `chore: sync events.json · ${new Date().toLocaleString('pt-BR')}`,
+      content,
+      branch: GH_BRANCH,
+    };
+    if (sha) body.sha = sha;
+
+    const res = await fetch(
+      `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }
+    );
+
+    if (res.ok) {
+      showToast('✅ events.json atualizado no GitHub!', 'success');
+    } else {
+      const err = await res.json();
+      if (res.status === 401) {
+        localStorage.removeItem('gh_token_aqua');
+        showToast('❌ Token inválido ou expirado. Cole o token novamente.', 'error');
+        document.getElementById('tokenOverlay').classList.add('open');
+      } else {
+        showToast(`❌ Erro: ${err.message}`, 'error');
+      }
+    }
+  } catch (e) {
+    showToast('❌ Erro de conexão. Verifique sua internet.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('syncing');
+    btn.textContent = '☁️ Sync GitHub';
+  }
+}
+
+// Auto-sync após cada mudança nos eventos
+async function autoSync() {
+  if (getToken()) {
+    await syncToGitHub();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════════════
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════════
 function init() {
-  // Today pill
   document.getElementById('todayText').textContent =
     today.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-
   buildFilters();
   buildLegend();
   render();
+
+  // Mostrar dica do token se ainda não configurado
+  if (!getToken()) {
+    setTimeout(() => showToast('💡 Configure o GitHub Token para sync automático.', 'success'), 1500);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // FILTERS
 // ═══════════════════════════════════════════════════════════════════════════════
-
 function buildFilters() {
-  if (!state.activeAreas) state.activeAreas = new Set();
   const areas = Object.keys(AREA_COLORS);
   const el = document.getElementById('filterGroup');
   const allActive = state.activeAreas.size === 0;
-
-  // "All" button
   const allStyle = allActive ? 'border-color:#0f172a;background:#0f172a;color:#fff;font-weight:700' : '';
   let html = `<button class="filter-btn${allActive?' active':''}" style="${allStyle}" onclick="clearFilters()">Todas as áreas</button>`;
-
   html += areas.map(a => {
     const c = AREA_COLORS[a];
     const active = state.activeAreas.has(a);
     const style = active ? `border-color:${c.border};background:${c.bg};color:${c.text};font-weight:700` : '';
     return `<button class="filter-btn${active?' active':''}" style="${style}" onclick="toggleArea('${a}')">${a}</button>`;
   }).join('');
-
   el.innerHTML = html;
 }
 
@@ -666,45 +774,29 @@ function buildLegend() {
   const items = Object.entries(AREA_COLORS).map(([area, c]) =>
     `<div class="legend-item"><div class="legend-dot" style="background:${c.border}"></div><span class="legend-text">${area}</span></div>`
   ).join('');
-  const recurs = Object.entries(BADGE).map(([,v]) =>
-    `<span class="recur-badge">${v}</span>`
-  ).join('');
+  const recurs = Object.entries(BADGE).map(([,v]) => `<span class="recur-badge">${v}</span>`).join('');
   el.innerHTML = `<span class="legend-label">Áreas:</span>${items}<div class="legend-recur">${recurs}</div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // VIEW SWITCHING
 // ═══════════════════════════════════════════════════════════════════════════════
-
 function setView(v) {
   state.view = v;
-  // sync activeQ to current month when switching
   if (v === 'quarter' || v === 'month') state.activeQ = Math.floor(state.viewMonth / 3);
   render();
 }
-
 function setQ(q) {
   state.activeQ = q;
   if (state.view === 'month') state.viewMonth = q * 3;
   render();
 }
-
 function toggleArea(a) {
-  if (state.activeAreas.has(a)) {
-    state.activeAreas.delete(a);
-  } else {
-    state.activeAreas.add(a);
-  }
-  buildFilters();
-  render();
+  if (state.activeAreas.has(a)) state.activeAreas.delete(a);
+  else state.activeAreas.add(a);
+  buildFilters(); render();
 }
-
-function clearFilters() {
-  state.activeAreas.clear();
-  buildFilters();
-  render();
-}
-
+function clearFilters() { state.activeAreas.clear(); buildFilters(); render(); }
 function navMonth(d) {
   state.viewMonth += d;
   if (state.viewMonth > 11) { state.viewMonth = 0; state.viewYear++; }
@@ -712,7 +804,6 @@ function navMonth(d) {
   state.activeQ = Math.floor(state.viewMonth / 3);
   render();
 }
-
 function jumpToday() {
   state.viewMonth = today.getMonth();
   state.viewYear  = today.getFullYear();
@@ -723,43 +814,25 @@ function jumpToday() {
 // ═══════════════════════════════════════════════════════════════════════════════
 // RENDER
 // ═══════════════════════════════════════════════════════════════════════════════
-
 function render() {
   const { view, activeQ, viewMonth } = state;
-  const filtered = EVENTS.filter(e => !state.activeAreas || state.activeAreas.size === 0 || state.activeAreas.has(e.area));
-
-  // Count
+  const filtered = EVENTS.filter(e => state.activeAreas.size === 0 || state.activeAreas.has(e.area));
   document.getElementById('subCount').textContent =
     `${filtered.length} entrega${filtered.length !== 1 ? 's' : ''} · Cross-áreas · 2026`;
-
-  // View buttons
   ['month','quarter','year'].forEach(v => {
     document.getElementById(`vbtn-${v}`).classList.toggle('active', view === v);
   });
-
-  // Quarter tabs
   const showQtabs = view === 'quarter' || view === 'month';
   document.getElementById('quarterTabs').style.display = showQtabs ? 'flex' : 'none';
-  if (showQtabs) {
-    [0,1,2,3].forEach(i => document.getElementById(`qtab-${i}`).classList.toggle('active', i === activeQ));
-  }
-
-  // Month nav
+  if (showQtabs) [0,1,2,3].forEach(i => document.getElementById(`qtab-${i}`).classList.toggle('active', i === activeQ));
   document.getElementById('monthNav').style.display = view === 'month' ? 'flex' : 'none';
-  if (view === 'month') {
-    document.getElementById('monthNavTitle').textContent =
-      `${MONTHS_FULL[state.viewMonth]} ${state.viewYear}`;
-  }
-
-  // Grid
+  if (view === 'month') document.getElementById('monthNavTitle').textContent = `${MONTHS_FULL[state.viewMonth]} ${state.viewYear}`;
   const grid = document.getElementById('calGrid');
   grid.className = `cal-grid ${view}`;
-
   let monthsToShow;
-  if (view === 'year')    monthsToShow = Array.from({length:12}, (_,i) => i);
+  if (view === 'year') monthsToShow = Array.from({length:12}, (_,i) => i);
   else if (view === 'quarter') monthsToShow = [activeQ*3, activeQ*3+1, activeQ*3+2];
-  else                    monthsToShow = [state.viewMonth];
-
+  else monthsToShow = [state.viewMonth];
   grid.innerHTML = monthsToShow.map(mi => renderMonthCard(mi, filtered, view)).join('');
 }
 
@@ -768,11 +841,7 @@ function renderMonthCard(mi, filtered, view) {
   const isCurrent = mi === today.getMonth() && state.viewYear === today.getFullYear();
   const qLabel = QUARTERS[Math.floor(mi / 3)];
   const nameClass = view === 'month' ? 'large' : 'small';
-
-  if (view === 'month') {
-    return renderMonthFull(mi, filtered, isCurrent);
-  }
-
+  if (view === 'month') return renderMonthFull(mi, filtered, isCurrent);
   const header = `
     <div class="month-header">
       <span class="month-name ${nameClass}">${view === 'year' ? MONTHS_SHORT[mi] : MONTHS_FULL[mi]}</span>
@@ -781,19 +850,16 @@ function renderMonthCard(mi, filtered, view) {
         <span class="q-badge">${qLabel}</span>
       </div>
     </div>`;
-
   const body = evs.length === 0
     ? `<div class="events-list"><div class="empty-month">—</div></div>`
     : `<div class="events-list">${evs.map(ev => renderEventRow(ev)).join('')}</div>`;
-
   return `<div class="month-card${isCurrent ? ' is-current' : ''}">${header}${body}</div>`;
 }
 
 function renderEventRow(ev) {
   const c = AREA_COLORS[ev.area] || { bg:'#f1f5f9', border:'#94a3b8', text:'#475569' };
   return `
-    <div class="event-row" style="background:${c.bg};border-left:3px solid ${c.border}"
-         onclick='showDetail(${ev.id})'>
+    <div class="event-row" style="background:${c.bg};border-left:3px solid ${c.border}" onclick='showDetail(${ev.id})'>
       <span class="event-day" style="color:${c.text}">${ev.day}</span>
       <div class="event-body">
         <div class="event-label">${ev.label}</div>
@@ -812,7 +878,6 @@ function renderMonthFull(mi, filtered, isCurrent) {
   const total = new Date(year, mi + 1, 0).getDate();
   const prevT = new Date(year, mi, 0).getDate();
   const qLabel = QUARTERS[Math.floor(mi / 3)];
-
   const header = `
     <div class="month-header">
       <span class="month-name large">${MONTHS_FULL[mi]} ${year}</span>
@@ -821,22 +886,18 @@ function renderMonthFull(mi, filtered, isCurrent) {
         <span class="q-badge">${qLabel}</span>
       </div>
     </div>`;
-
   const weekdaysRow = `<div class="cal-weekdays">${WEEKDAYS.map(d => `<div class="cal-weekday">${d}</div>`).join('')}</div>`;
-
   let cells = [];
   for (let i = first - 1; i >= 0; i--) cells.push({ day: prevT - i, cur: false });
   for (let i = 1; i <= total; i++)      cells.push({ day: i, cur: true });
   while (cells.length % 7)              cells.push({ day: cells.length - total - first + 1, cur: false });
-
   const daysGrid = cells.map(({ day, cur }) => {
     const dow = new Date(year, mi, cur ? day : 1).getDay();
     const isToday = cur && day === today.getDate() && mi === today.getMonth() && year === today.getFullYear();
     const isWknd  = dow === 0 || dow === 6;
-    const dateEvs = cur ? evs.filter(e => e.day === day).sort((a,b) => a.day - b.day) : [];
-    const show    = dateEvs.slice(0, 3);
-    const rest    = dateEvs.length - show.length;
-
+    const dateEvs = cur ? evs.filter(e => e.day === day) : [];
+    const show = dateEvs.slice(0, 3);
+    const rest = dateEvs.length - show.length;
     const cls = ['cal-cell', !cur && 'other-month', isToday && 'today-cell', isWknd && 'weekend-cell'].filter(Boolean).join(' ');
     const numEl = `<div class="cell-day-num">${day}</div>`;
     const pills = show.map(ev => {
@@ -844,10 +905,8 @@ function renderMonthFull(mi, filtered, isCurrent) {
       return `<div class="cell-event" style="background:${c.bg};color:${c.text};border-left-color:${c.border}" onclick='showDetail(${ev.id})' title="${ev.label}">${ev.label}</div>`;
     }).join('');
     const moreBadge = rest > 0 ? `<div class="cell-more">+${rest} mais</div>` : '';
-
     return `<div class="${cls}">${numEl}${pills}${moreBadge}</div>`;
   }).join('');
-
   return `<div class="month-card${isCurrent ? ' is-current' : ''}">
     ${header}${weekdaysRow}
     <div class="cal-days">${daysGrid}</div>
@@ -857,7 +916,6 @@ function renderMonthFull(mi, filtered, isCurrent) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // MODALS
 // ═══════════════════════════════════════════════════════════════════════════════
-
 let currentEventId = null;
 
 function showDetail(id) {
@@ -865,15 +923,11 @@ function showDetail(id) {
   if (!ev) return;
   currentEventId = id;
   const c = AREA_COLORS[ev.area] || { bg:'#f1f5f9', border:'#94a3b8', text:'#475569' };
-
   document.getElementById('dAreaBadge').style.cssText = `background:${c.bg};color:${c.text};border:1.5px solid ${c.border}`;
-  document.getElementById('dAreaBadge').innerHTML =
-    `<div style="width:8px;height:8px;border-radius:50%;background:${c.border}"></div>${ev.area}`;
+  document.getElementById('dAreaBadge').innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${c.border}"></div>${ev.area}`;
   document.getElementById('dTitle').textContent = ev.label;
-  document.getElementById('dDate').innerHTML =
-    `📅 ${ev.day} de ${MONTHS_FULL[ev.month - 1]}${ev.recurrence ? ` &nbsp;·&nbsp; ${BADGE[ev.recurrence]}` : ''}`;
+  document.getElementById('dDate').innerHTML = `📅 ${ev.day} de ${MONTHS_FULL[ev.month - 1]}${ev.recurrence ? ` &nbsp;·&nbsp; ${BADGE[ev.recurrence]}` : ''}`;
   document.getElementById('dDesc').textContent = ev.desc || 'Sem descrição adicional.';
-
   document.getElementById('detailOverlay').classList.add('open');
 }
 
@@ -903,6 +957,7 @@ function saveEdit() {
   EVENTS[idx] = { ...EVENTS[idx], label: title, month, day, area, recurrence: recur || undefined, desc };
   closeAll();
   render();
+  autoSync();
 }
 
 function deleteEvent() {
@@ -910,6 +965,7 @@ function deleteEvent() {
   EVENTS = EVENTS.filter(e => e.id !== currentEventId);
   closeAll();
   render();
+  autoSync();
 }
 
 function openAdd() {
@@ -933,36 +989,16 @@ function addEvent() {
   EVENTS.push({ id: nextId++, month: m, day: d, area, label: title, recurrence: recur || undefined, desc });
   closeAll();
   render();
+  autoSync();
 }
 
 function closeAll() {
-  document.getElementById('detailOverlay').classList.remove('open');
-  document.getElementById('addOverlay').classList.remove('open');
-  document.getElementById('editOverlay').classList.remove('open');
+  ['detailOverlay','addOverlay','editOverlay','tokenOverlay'].forEach(id =>
+    document.getElementById(id).classList.remove('open')
+  );
 }
+function closeOnBg(e, id) { if (e.target.id === id) closeAll(); }
 
-function closeOnBg(e, id) {
-  if (e.target.id === id) closeAll();
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// EXPORT
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function exportHTML() {
-  const src    = document.documentElement.outerHTML;
-  const marker = 'let EVENTS = ';
-  const start  = src.indexOf(marker) + marker.length;
-  const end    = src.indexOf(';\n\nlet nextId', start) + 2;
-  const updated = src.slice(0, start) + JSON.stringify(EVENTS, null, 2) + ';\n' + src.slice(end);
-  const blob = new Blob([updated], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'aqua-calendario-ops.html';
-  a.click();
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
 init();
 </script>
 </body>
