@@ -660,14 +660,6 @@
       "recurrence": "monthly"
     },
     {
-      "id": 202,
-      "month": 3,
-      "day": 18,
-      "area": "Operations",
-      "label": "teste (2/5)",
-      "desc": ""
-    },
-    {
       "id": 203,
       "month": 3,
       "day": 19,
@@ -693,5 +685,5 @@
     }
   ],
   "nextId": 206,
-  "updatedAt": "2026-03-16T19:32:42.984Z"
+  "updatedAt": "2026-03-16T19:32:48.347Z"
 }
