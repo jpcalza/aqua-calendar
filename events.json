@@ -168,14 +168,6 @@
       "desc": ""
     },
     {
-      "id": 24,
-      "month": 10,
-      "day": 31,
-      "area": "Tails",
-      "label": "Portco Budget Submission – FY+1",
-      "recurrence": "annual"
-    },
-    {
       "id": 25,
       "month": 11,
       "day": 15,
@@ -750,5 +742,5 @@
     }
   ],
   "nextId": 255,
-  "updatedAt": "2026-03-16T21:06:01.657Z"
+  "updatedAt": "2026-03-16T21:06:03.899Z"
 }
