@@ -674,16 +674,8 @@
       "area": "Controllership",
       "label": "Q4 REPORTING PACKAGE DELVERY",
       "desc": "(OFFSHORE FINANCIALS, CAP TABLES, Q REPORT)"
-    },
-    {
-      "id": 218,
-      "month": 4,
-      "day": 11,
-      "area": "Controllership",
-      "label": "Q4 SUPPLEMENTARY REPORTING PACKAGE DELVERY (11/15)",
-      "desc": ""
     }
   ],
   "nextId": 223,
-  "updatedAt": "2026-03-16T20:56:38.827Z"
+  "updatedAt": "2026-03-16T20:56:41.746Z"
 }
