@@ -134,14 +134,6 @@
       "recurrence": "semi-annual"
     },
     {
-      "id": 20,
-      "month": 9,
-      "day": 15,
-      "area": "Operations",
-      "label": "AGM Prep – Draft Materials",
-      "desc": ""
-    },
-    {
       "id": 21,
       "month": 9,
       "day": 30,
@@ -830,5 +822,5 @@
     }
   ],
   "nextId": 267,
-  "updatedAt": "2026-03-16T21:14:41.875Z"
+  "updatedAt": "2026-03-16T21:15:09.191Z"
 }
