@@ -576,29 +576,29 @@ function isGHConfigured(){
   return GH_OWNER!=='YOUR_GITHUB_USERNAME' && GH_REPO!=='YOUR_REPO_NAME';
 }
 
-// READ from GitHub
+// READ from GitHub via API (CORS-friendly)
 async function loadData(){
   let loaded=false;
   if(isGHConfigured()){
     try{
-      // Try raw content first (faster, no API rate limit)
-      const rawUrl=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${GH_BRANCH}/${GH_FILE}?_=${Date.now()}`;
-      const res=await fetch(rawUrl,{cache:'no-store'});
+      const token=getToken();
+      const apiUrl=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?ref=${GH_BRANCH}&t=${Date.now()}`;
+      const h={'Accept':'application/vnd.github.v3+json'};
+      if(token)h['Authorization']=`token ${token}`;
+      const res=await fetch(apiUrl,{headers:h,cache:'no-store'});
       if(res.ok){
-        const content=await res.json();
+        const json=await res.json();
+        ghSha=json.sha;
+        // Decode base64 content (handle Unicode)
+        const raw=decodeURIComponent(escape(atob(json.content.replace(/\s/g,''))));
+        const content=JSON.parse(raw);
         if(content.events&&content.events.length){
           EVENTS=content.events;
           nextId=content.nextId||200;
           loaded=true;
         }
-        // Also get SHA for future writes
-        try{
-          const apiUrl=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?ref=${GH_BRANCH}`;
-          const apiRes=await fetch(apiUrl,{headers:{'Accept':'application/vnd.github.v3+json'}});
-          if(apiRes.ok){const j=await apiRes.json();ghSha=j.sha;}
-        }catch(e){}
       }
-    }catch(e){ console.warn('GitHub read failed, trying localStorage.',e); }
+    }catch(e){ console.warn('GitHub read failed.',e); }
   }
   // Fallback: localStorage
   if(!loaded){
@@ -644,20 +644,20 @@ async function saveData(){
       ghSha=data.content.sha;
       showSyncStatus('✓ Sincronizado');
     }else{
-      const err=await res.json();
       if(res.status===409){
-        // Conflict — get fresh SHA and retry once
+        // Conflict — get fresh SHA and retry
         try{
           const apiUrl=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?ref=${GH_BRANCH}`;
           const apiRes=await fetch(apiUrl,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});
           if(apiRes.ok){const j=await apiRes.json();ghSha=j.sha;}
-          const body2={message:`Aqua Calendar · ${new Date().toLocaleString('pt-BR')}`,content,branch:GH_BRANCH,sha:ghSha};
-          const res2=await fetch(url,{method:'PUT',headers:{'Authorization':`token ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body2)});
+          body.sha=ghSha;
+          const res2=await fetch(url,{method:'PUT',headers:{'Authorization':`token ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},body:JSON.stringify(body)});
           if(res2.ok){const d2=await res2.json();ghSha=d2.content.sha;showSyncStatus('✓ Sincronizado');}
-          else showSyncStatus('✕ Conflito persistente');
-        }catch(e){showSyncStatus('✕ Erro ao resolver conflito');}
+          else{showSyncStatus('✕ Erro ao sincronizar');}
+        }catch(e){showSyncStatus('✕ Erro');}
       }else{
-        showSyncStatus('✕ Erro: '+(err.message||res.status));
+        const err=await res.json().catch(()=>({}));
+        showSyncStatus('✕ '+(err.message||'Erro '+res.status));
       }
     }
   }catch(e){
