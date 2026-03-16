@@ -219,9 +219,10 @@
       "id": 27,
       "month": 12,
       "day": 15,
-      "area": "Ops & CS",
+      "area": "Operations",
       "label": "LPAC Meeting – H2",
-      "recurrence": "semi-annual"
+      "recurrence": "semi-annual",
+      "desc": ""
     },
     {
       "id": 28,
@@ -658,5 +659,5 @@
     }
   ],
   "nextId": 201,
-  "updatedAt": "2026-03-16T18:53:51.398Z"
+  "updatedAt": "2026-03-16T18:53:56.484Z"
 }
