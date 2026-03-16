@@ -721,7 +721,7 @@
       "month": 6,
       "day": 24,
       "area": "Aqua",
-      "label": "AGM",
+      "label": "AGM – Annual General Meeting",
       "desc": ""
     },
     {
@@ -830,5 +830,5 @@
     }
   ],
   "nextId": 268,
-  "updatedAt": "2026-03-16T21:21:18.414Z"
+  "updatedAt": "2026-03-16T21:21:29.638Z"
 }
