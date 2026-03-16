@@ -779,8 +779,16 @@
       "area": "Operations",
       "label": "FIP 7 XP Q UPDATE CALL",
       "desc": ""
+    },
+    {
+      "id": 261,
+      "month": 11,
+      "day": 15,
+      "area": "Operations",
+      "label": "Q3 REPORTING PACKAGE DELVERY",
+      "desc": "(OFFSHORE FINANCIALS, CAP TABLES, Q REPORT)"
     }
   ],
-  "nextId": 261,
-  "updatedAt": "2026-03-16T21:10:57.287Z"
+  "nextId": 262,
+  "updatedAt": "2026-03-16T21:12:32.857Z"
 }
