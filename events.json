@@ -237,9 +237,10 @@
       "id": 29,
       "month": 12,
       "day": 31,
-      "area": "Ops & CS",
+      "area": "Operations",
       "label": "Allocation Committee – Q4",
-      "recurrence": "quarterly"
+      "recurrence": "quarterly",
+      "desc": ""
     },
     {
       "id": 30,
@@ -660,5 +661,5 @@
     }
   ],
   "nextId": 201,
-  "updatedAt": "2026-03-16T18:54:01.340Z"
+  "updatedAt": "2026-03-16T18:54:06.097Z"
 }
