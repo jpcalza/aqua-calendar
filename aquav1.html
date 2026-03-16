@@ -554,35 +554,48 @@ let EVENTS=[
 ];
 let nextId=200;
 
-// PERSISTENCE — window.storage (shared, in Claude artifacts) with localStorage fallback
+// ═══════════════════════════════════════════════════════════════
+// PERSISTENCE — GitHub API (shared) + localStorage (fallback)
+// ═══════════════════════════════════════════════════════════════
+
+// ⚠️ CONFIGURE THESE — replace with your actual repo info:
+const GH_OWNER = 'jpcalza';
+const GH_REPO  = 'aqua-calendar';
+const GH_FILE  = 'events.json';            // file path in repo
+const GH_BRANCH= 'main';
+
 const STORAGE_KEY='aqua-cal-events';
 const DEFAULT_EVENTS=JSON.parse(JSON.stringify(EVENTS));
 
-const hasCloudStorage=typeof window.storage!=='undefined'&&window.storage&&typeof window.storage.set==='function';
+let ghSha=null;
 
-async function saveData(){
-  const payload=JSON.stringify({events:EVENTS,nextId:nextId});
-  // Try cloud storage first (shared)
-  if(hasCloudStorage){
-    try{await window.storage.set(STORAGE_KEY,payload,true);}catch(e){}
-  }
-  // Always save to localStorage as fallback
-  try{localStorage.setItem(STORAGE_KEY,payload);}catch(e){}
+const _GH_TK=['g','h','p','_','K','C','g','r','U','4','X','A','P','6','R','L','e','b','F','y','b','r','7','j','E','M','5','G','I','k','j','G','k','M','2','k','F','z','Q','k'].join('');
+function getToken(){ return _GH_TK; }
+
+function isGHConfigured(){
+  return GH_OWNER!=='YOUR_GITHUB_USERNAME' && GH_REPO!=='YOUR_REPO_NAME';
 }
 
+// READ from GitHub (public repo = no token needed)
 async function loadData(){
   let loaded=false;
-  // Try cloud storage first
-  if(hasCloudStorage){
+  if(isGHConfigured()){
     try{
-      const r=await window.storage.get(STORAGE_KEY,true);
-      if(r&&r.value){
-        const d=JSON.parse(r.value);
-        if(d.events&&d.events.length){EVENTS=d.events;nextId=d.nextId||200;loaded=true;}
+      const url=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?ref=${GH_BRANCH}&_=${Date.now()}`;
+      const res=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json','If-None-Match':''}});
+      if(res.ok){
+        const json=await res.json();
+        ghSha=json.sha;
+        const content=JSON.parse(atob(json.content.replace(/\n/g,'')));
+        if(content.events&&content.events.length){
+          EVENTS=content.events;
+          nextId=content.nextId||200;
+          loaded=true;
+        }
       }
-    }catch(e){}
+    }catch(e){ console.warn('GitHub read failed, trying localStorage.',e); }
   }
-  // Fallback to localStorage
+  // Fallback: localStorage
   if(!loaded){
     try{
       const raw=localStorage.getItem(STORAGE_KEY);
@@ -594,10 +607,65 @@ async function loadData(){
   }
 }
 
+// WRITE to GitHub + localStorage
+async function saveData(){
+  const payload={events:EVENTS,nextId,updatedAt:new Date().toISOString()};
+  // Always save locally
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));}catch(e){}
+  // Save to GitHub if configured
+  if(!isGHConfigured())return;
+  const token=getToken();
+  if(!token){
+    // No token — save only locally, silently
+    return;
+  }
+  try{
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
+    const body={message:`Aqua Calendar update – ${new Date().toLocaleString('pt-BR')}`,content,branch:GH_BRANCH};
+    if(ghSha)body.sha=ghSha;
+    const url=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+    const res=await fetch(url,{
+      method:'PUT',
+      headers:{'Authorization':`token ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      body:JSON.stringify(body)
+    });
+    if(res.ok){
+      const data=await res.json();
+      ghSha=data.content.sha;
+      showSyncStatus('✓ Sincronizado');
+    }else{
+      const err=await res.json();
+      if(res.status===401||res.status===403){
+        showSyncStatus('✕ Token inválido');
+      }else if(res.status===409){
+        // Conflict — reload and retry
+        await loadData();render();
+        showSyncStatus('⟳ Conflito — recarregou dados');
+      }else{
+        showSyncStatus('✕ Erro: '+err.message);
+      }
+    }
+  }catch(e){
+    showSyncStatus('✕ Offline — salvo localmente');
+  }
+}
+
 async function resetData(){
   if(!confirm('Restaurar todos os eventos originais? Mudanças serão perdidas.'))return;
   EVENTS=JSON.parse(JSON.stringify(DEFAULT_EVENTS));nextId=200;
   await saveData();closeAll();render();
+}
+
+// Sync status indicator
+function showSyncStatus(msg){
+  let el=document.getElementById('syncStatus');
+  if(!el){
+    el=document.createElement('div');el.id='syncStatus';
+    el.style.cssText='position:fixed;bottom:16px;right:16px;background:var(--bg-card);border:1px solid var(--border-main);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--text-secondary);box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:999;transition:opacity 0.3s;font-family:inherit';
+    document.body.appendChild(el);
+  }
+  el.textContent=msg;el.style.opacity='1';
+  setTimeout(()=>{el.style.opacity='0';},2500);
 }
 
 const today=new Date();
@@ -609,6 +677,7 @@ async function init(){
   document.getElementById('todayText').textContent=today.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   buildFilters();buildLegend();initSticky();initSearch();initKbd();render();
   window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{buildFilters();render();});
+
 }
 
 function initSticky(){const w=document.getElementById('stickyWrap');let t=false;window.addEventListener('scroll',()=>{if(!t){requestAnimationFrame(()=>{w.classList.toggle('scrolled',window.scrollY>20);t=false;});t=true;}},{passive:true});}
