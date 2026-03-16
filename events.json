@@ -787,8 +787,16 @@
       "area": "Operations",
       "label": "Q3 REPORTING PACKAGE DELVERY",
       "desc": "(OFFSHORE FINANCIALS, CAP TABLES, Q REPORT)"
+    },
+    {
+      "id": 262,
+      "month": 11,
+      "day": 16,
+      "area": "Operations",
+      "label": "Q3 SUPPLEMENTARY REPORTING PACKAGE DELVERY",
+      "desc": "(GALAXY, AGF LATAM, SPV COINVESTROS 1 AND 2 FINANCIALS AND CAP TABLES AND LP ADDITIONAL INFORMATION)"
     }
   ],
-  "nextId": 262,
-  "updatedAt": "2026-03-16T21:12:32.857Z"
+  "nextId": 263,
+  "updatedAt": "2026-03-16T21:13:00.494Z"
 }
