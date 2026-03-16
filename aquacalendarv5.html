@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aqua Capital · Aqua Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-app: #F0F4F8; --bg-card: #fff; --bg-card-hover: #f8fafc; --bg-header: #fafbfc;
+  --bg-input: #f8fafc; --bg-toggle: #e2e8f0; --bg-empty: #e2e8f0; --bg-today-pill: #EEF2FF;
+  --bg-overlay: rgba(15,23,42,0.5); --text-primary: #0f172a; --text-secondary: #64748b;
+  --text-tertiary: #94a3b8; --text-body: #475569; --text-label: #1e293b;
+  --border-main: #e2e8f0; --border-light: #f1f5f9; --border-today: #c7d2fe;
+  --accent: #2B7BB9; --accent-hover: #1a5a8a; --accent-indigo: #4338ca; --accent-indigo-bg: #EEF2FF;
+  --tag-recur-bg: #f1f5f9; --tag-recur-text: #94a3b8;
+  --shadow-card: 0 1px 4px rgba(0,0,0,0.05);
+  --shadow-card-current: 0 0 0 2px rgba(43,123,185,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.2);
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg-app: #0f172a; --bg-card: #1e293b; --bg-card-hover: #253347; --bg-header: #1a2536;
+  --bg-input: #253347; --bg-toggle: #334155; --bg-empty: #334155;
+  --bg-today-pill: rgba(67,56,202,0.15); --bg-overlay: rgba(0,0,0,0.7);
+  --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-tertiary: #64748b;
+  --text-body: #cbd5e1; --text-label: #e2e8f0;
+  --border-main: #334155; --border-light: #253347; --border-today: rgba(67,56,202,0.4);
+  --accent: #3b8fd4; --accent-hover: #5ba3e0; --accent-indigo: #818cf8;
+  --accent-indigo-bg: rgba(67,56,202,0.15);
+  --tag-recur-bg: #334155; --tag-recur-text: #94a3b8;
+  --shadow-card: 0 1px 4px rgba(0,0,0,0.2);
+  --shadow-card-current: 0 0 0 2px rgba(59,143,212,0.25), 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-modal: 0 20px 60px rgba(0,0,0,0.5);
+}}
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg-app); min-height: 100vh; color: var(--text-primary); }
+.app { max-width: 1440px; margin: 0 auto; padding: 28px 24px 60px; }
+
+/* STICKY */
+.sticky-wrap { position: sticky; top: 0; z-index: 100; background: var(--bg-app); padding-bottom: 12px; transition: box-shadow 0.25s; }
+.sticky-wrap.scrolled { box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+@media (prefers-color-scheme: dark) { .sticky-wrap.scrolled { box-shadow: 0 2px 16px rgba(0,0,0,0.3); } }
+
+/* HEADER */
+.header { margin-bottom: 0; }
+.header-row1 { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.header-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.header-logo { height: 32px; width: auto; object-fit: contain; }
+.header-logo-dark { display: none; }
+@media (prefers-color-scheme: dark) { .header-logo-light { display: none; } .header-logo-dark { display: block; } }
+.header-title { font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.5px; white-space: nowrap; }
+.header-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.header-sub { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; }
+.today-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--bg-today-pill); color: var(--accent-indigo); border: 1.5px solid var(--border-today); border-radius: 16px; padding: 3px 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.today-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-indigo); }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 1; min-width: 0; }
+
+/* SEARCH — contained, no overflow */
+.search-wrap { position: relative; width: 220px; min-width: 140px; flex-shrink: 1; }
+.search-input { width: 100%; background: var(--bg-card); border: 1.5px solid var(--border-main); border-radius: 8px; padding: 6px 28px 6px 30px; color: var(--text-primary); font-family: inherit; font-size: 12px; outline: none; transition: border-color 0.2s; }
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--text-tertiary); }
+.search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 12px; pointer-events: none; }
+.search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-tertiary); font-size: 14px; cursor: pointer; display: none; line-height: 1; }
+.search-clear.visible { display: block; }
+.search-clear:hover { color: var(--text-primary); }
+.search-info { font-size: 10px; color: var(--accent-indigo); font-weight: 600; display: none; margin-top: 2px; }
+.search-info.visible { display: block; }
+
+/* TOOLBAR */
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.filter-group { display: flex; gap: 4px; flex-wrap: wrap; }
+.filter-btn { padding: 4px 12px; border-radius: 16px; cursor: pointer; font-size: 11px; font-weight: 400; border: 1.5px solid var(--border-main); background: var(--bg-card); color: var(--text-secondary); font-family: inherit; transition: all 0.2s; }
+.filter-btn:hover { border-color: var(--text-tertiary); color: var(--text-primary); }
+.filter-btn.active { font-weight: 700; }
+.toolbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.add-event-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 16px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: inherit; background: var(--accent-indigo-bg); border: 1.5px solid var(--border-today); color: var(--accent-indigo); transition: all 0.2s; white-space: nowrap; }
+.add-event-btn:hover { background: rgba(67,56,202,0.15); border-color: var(--accent-indigo); }
+.icon-btn { width: 30px; height: 30px; border-radius: 7px; border: 1.5px solid var(--border-main); background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.view-toggle { display: flex; background: var(--bg-toggle); border-radius: 7px; padding: 2px; gap: 1px; }
+.view-btn { padding: 4px 12px; border-radius: 5px; border: none; font-size: 11px; cursor: pointer; font-family: inherit; background: transparent; color: var(--text-secondary); font-weight: 400; transition: all 0.2s; }
+.view-btn.active { background: var(--bg-card); color: var(--text-primary); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* AGENDA VIEW */
+.agenda-list { max-width: 800px; }
+.agenda-month-header { font-size: 14px; font-weight: 700; color: var(--text-primary); padding: 12px 0 6px; border-bottom: 1.5px solid var(--border-main); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.agenda-month-count { font-size: 11px; font-weight: 600; color: var(--accent-indigo); background: var(--accent-indigo-bg); border-radius: 10px; padding: 1px 8px; }
+.agenda-item { display: flex; gap: 12px; padding: 8px 10px; border-radius: 8px; margin-bottom: 3px; cursor: pointer; transition: background 0.15s, transform 0.15s; align-items: flex-start; }
+.agenda-item:hover { background: var(--bg-card-hover); transform: translateX(2px); }
+.agenda-date-col { min-width: 44px; text-align: right; flex-shrink: 0; }
+.agenda-day { font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
+.agenda-weekday { font-size: 9px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; }
+.agenda-bar { width: 3px; border-radius: 2px; flex-shrink: 0; min-height: 32px; }
+.agenda-content { flex: 1; min-width: 0; }
+.agenda-title { font-size: 13px; font-weight: 600; color: var(--text-label); line-height: 1.35; }
+.agenda-meta { display: flex; gap: 6px; align-items: center; margin-top: 3px; flex-wrap: wrap; }
+.agenda-area-tag { font-size: 9px; color: #fff; border-radius: 3px; padding: 1px 5px; font-weight: 600; }
+.agenda-recur-tag { font-size: 9px; background: var(--tag-recur-bg); color: var(--tag-recur-text); border-radius: 3px; padding: 1px 5px; }
+.agenda-countdown { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
+.agenda-past { opacity: 0.5; }
+
+/* WEEK GROUPING (quarter view) */
+.week-group { margin-bottom: 8px; }
+.week-label { font-size: 10px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 10px 2px; border-bottom: 1px solid var(--border-light); margin-bottom: 2px; }
+
+/* NAV ROW — Q tabs + month nav combined in one consistent row */
+.nav-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; margin-bottom: 4px; }
+.q-tab { padding: 5px 16px; border-radius: 7px; cursor: pointer; font-weight: 600; font-size: 12px; font-family: inherit; border: 1.5px solid var(--border-main); background: var(--bg-card); color: var(--text-secondary); transition: all 0.2s; }
+.q-tab.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+.nav-sep { width: 1px; height: 24px; background: var(--border-main); margin: 0 4px; }
+.month-nav-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border-main); background: var(--bg-card); color: var(--text-secondary); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; transition: all 0.2s; flex-shrink: 0; }
+.month-nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+.month-nav-title { font-size: 16px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+.today-jump { padding: 4px 12px; border-radius: 16px; border: 1.5px solid var(--border-main); background: var(--bg-card); color: var(--text-secondary); font-size: 11px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.2s; margin-left: auto; }
+.today-jump:hover { border-color: var(--accent); color: var(--accent); }
+
+/* GRID */
+.cal-grid { display: grid; gap: 12px; }
+.cal-grid.year { grid-template-columns: repeat(4, 1fr); }
+.cal-grid.quarter { grid-template-columns: repeat(3, 1fr); }
+.cal-grid.month { grid-template-columns: 1fr; }
+
+/* ANIMATIONS */
+@keyframes cardEnter { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.month-card { animation: cardEnter 0.35s ease-out both; }
+.cal-grid.year .month-card:nth-child(1){animation-delay:.00s}.cal-grid.year .month-card:nth-child(2){animation-delay:.03s}.cal-grid.year .month-card:nth-child(3){animation-delay:.06s}.cal-grid.year .month-card:nth-child(4){animation-delay:.09s}.cal-grid.year .month-card:nth-child(5){animation-delay:.12s}.cal-grid.year .month-card:nth-child(6){animation-delay:.15s}.cal-grid.year .month-card:nth-child(7){animation-delay:.18s}.cal-grid.year .month-card:nth-child(8){animation-delay:.21s}.cal-grid.year .month-card:nth-child(9){animation-delay:.24s}.cal-grid.year .month-card:nth-child(10){animation-delay:.27s}.cal-grid.year .month-card:nth-child(11){animation-delay:.30s}.cal-grid.year .month-card:nth-child(12){animation-delay:.33s}
+.cal-grid.quarter .month-card:nth-child(1){animation-delay:.00s}.cal-grid.quarter .month-card:nth-child(2){animation-delay:.06s}.cal-grid.quarter .month-card:nth-child(3){animation-delay:.12s}
+
+/* MONTH CARD */
+.month-card { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-main); overflow: hidden; box-shadow: var(--shadow-card); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+.month-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+@media (prefers-color-scheme: dark) { .month-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.25); } }
+.month-card.is-current { border-color: var(--accent); box-shadow: var(--shadow-card-current); }
+.month-card.drag-over { border-color: var(--accent-indigo); box-shadow: 0 0 0 2px var(--accent-indigo-bg), var(--shadow-card); }
+
+.month-header { padding: 10px 14px 9px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; background: var(--bg-header); user-select: none; }
+.month-header.collapsible { cursor: pointer; }
+.month-header.collapsible:hover { background: var(--bg-card-hover); }
+.collapse-icon { font-size: 10px; color: var(--text-tertiary); transition: transform 0.25s; margin-right: 6px; display: inline-block; }
+.collapse-icon.collapsed { transform: rotate(-90deg); }
+.month-name { font-weight: 700; color: var(--text-primary); }
+.month-name.large { font-size: 18px; }
+.month-name.small { font-size: 13px; }
+.month-header-right { display: flex; gap: 6px; align-items: center; }
+.event-count { font-size: 10px; background: var(--accent-indigo-bg); color: var(--accent-indigo); border-radius: 10px; padding: 1px 7px; font-weight: 600; }
+.q-badge { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
+
+/* COLLAPSE */
+.month-body { transition: max-height 0.3s ease, opacity 0.25s; overflow: hidden; }
+.month-body.collapsed { max-height: 0 !important; opacity: 0; }
+
+/* CALENDAR */
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 8px 10px 4px; }
+.cal-weekday { text-align: center; font-size: 10px; font-weight: 700; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 0; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); padding: 0 10px 10px; gap: 2px; }
+.cal-cell { min-height: 90px; border-radius: 8px; padding: 6px 5px; display: flex; flex-direction: column; gap: 3px; border: 1px solid transparent; transition: background 0.15s; }
+.cal-cell:hover { background: var(--bg-card-hover); }
+.cal-cell.other-month { opacity: 0.3; }
+.cal-cell.today-cell { background: var(--bg-today-pill); border-color: var(--border-today); }
+.cal-cell.weekend-cell .cell-day-num { color: var(--text-tertiary); }
+.cell-day-num { font-size: 12px; font-weight: 600; color: var(--text-body); line-height: 1; margin-bottom: 2px; width: 22px; text-align: center; }
+.today-cell .cell-day-num { background: var(--accent-indigo); color: #fff; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+.cell-event { font-size: 9.5px; font-weight: 500; padding: 2px 5px; border-radius: 4px; line-height: 1.3; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 2px solid; transition: opacity 0.15s; }
+.cell-event:hover { opacity: 0.8; }
+.cell-more { font-size: 9px; color: var(--text-tertiary); font-weight: 500; padding: 1px 4px; cursor: pointer; }
+.cell-more:hover { color: var(--accent-indigo); }
+
+/* EVENT LIST */
+.events-list { padding: 8px 10px; min-height: 40px; }
+.event-row { display: flex; gap: 7px; padding: 5px 7px; border-radius: 7px; margin-bottom: 4px; cursor: pointer; transition: opacity 0.15s, transform 0.15s; position: relative; }
+.event-row:hover { opacity: 0.85; transform: translateX(2px); }
+.event-row.drag-source { opacity: 0.4; }
+.event-row.search-highlight { box-shadow: 0 0 0 2px var(--accent-indigo); }
+.event-day { font-size: 10px; font-weight: 700; min-width: 20px; padding-top: 1px; }
+.event-body { flex: 1; min-width: 0; }
+.event-label { font-size: 11px; color: var(--text-label); font-weight: 500; line-height: 1.35; }
+.event-tags { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
+.tag-area { font-size: 9px; color: #fff; border-radius: 3px; padding: 1px 5px; font-weight: 600; }
+.tag-recur { font-size: 9px; background: var(--tag-recur-bg); color: var(--tag-recur-text); border-radius: 3px; padding: 1px 5px; }
+.empty-month { color: var(--bg-empty); font-size: 11px; text-align: center; padding: 20px 0; }
+.drag-handle { cursor: grab; color: var(--text-tertiary); font-size: 10px; padding: 2px 4px; margin-right: 2px; opacity: 0; transition: opacity 0.15s; }
+.event-row:hover .drag-handle { opacity: 1; }
+
+/* TOOLTIP */
+.tooltip { position: fixed; z-index: 300; pointer-events: none; background: var(--bg-card); border: 1px solid var(--border-main); border-radius: 10px; padding: 10px 14px; min-width: 200px; max-width: 300px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); opacity: 0; transform: translateY(4px); transition: opacity 0.15s, transform 0.15s; }
+.tooltip.visible { opacity: 1; transform: translateY(0); }
+.tooltip-area { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 6px; border-radius: 3px; margin-bottom: 6px; }
+.tooltip-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; line-height: 1.3; }
+.tooltip-date { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; }
+.tooltip-desc { font-size: 11px; color: var(--text-body); line-height: 1.4; border-top: 1px solid var(--border-light); padding-top: 6px; margin-top: 4px; }
+.tooltip-recur { font-size: 9px; background: var(--tag-recur-bg); color: var(--tag-recur-text); border-radius: 3px; padding: 1px 5px; display: inline-block; }
+.tooltip-hint { font-size: 9px; color: var(--text-tertiary); margin-top: 6px; font-style: italic; }
+
+/* MODAL */
+.overlay { position: fixed; inset: 0; background: var(--bg-overlay); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--bg-card); border-radius: 16px; padding: 28px; width: 440px; max-width: 92vw; max-height: 90vh; overflow-y: auto; transform: translateY(16px) scale(0.97); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: var(--shadow-modal); position: relative; border: 1px solid var(--border-main); }
+.overlay.open .modal { transform: translateY(0) scale(1); }
+.modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 20px; color: var(--text-tertiary); cursor: pointer; line-height: 1; }
+.modal-close:hover { color: var(--text-primary); }
+.modal-area-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; padding: 3px 8px; border-radius: 4px; }
+.modal-title { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; line-height: 1.3; }
+.modal-date { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+.modal-desc { font-size: 14px; color: var(--text-body); line-height: 1.6; border-top: 1px solid var(--border-light); padding-top: 14px; }
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 5px; display: block; }
+.form-input { width: 100%; background: var(--bg-input); border: 1.5px solid var(--border-main); border-radius: 8px; padding: 9px 12px; color: var(--text-primary); font-family: inherit; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.form-input:focus { border-color: var(--accent); background: var(--bg-card); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-primary { width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 6px; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { width: 100%; padding: 11px; background: var(--bg-input); color: var(--text-body); border: none; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 6px; }
+.btn-secondary:hover { background: var(--bg-toggle); }
+.btn-delete { padding: 11px 16px; background: #FFF4F4; color: #C0392B; border: 1.5px solid #fca5a5; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+@media (prefers-color-scheme: dark) { .btn-delete { background: rgba(192,57,43,0.12); color: #f87171; border-color: rgba(192,57,43,0.3); } }
+
+/* LEGEND */
+.legend { margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--border-main); padding-top: 16px; }
+.legend-label { font-size: 11px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+.legend-text { font-size: 11px; color: var(--text-body); }
+.legend-recur { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.recur-badge { font-size: 9px; background: var(--tag-recur-bg); color: var(--tag-recur-text); border-radius: 3px; padding: 2px 6px; font-weight: 500; }
+
+/* KBD HINT */
+.kbd-hint { margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-light); }
+.kbd { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-tertiary); }
+.kbd-key { background: var(--bg-input); border: 1px solid var(--border-main); border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 600; color: var(--text-secondary); font-family: monospace; }
+
+/* PRINT */
+@media print {
+  body { background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .sticky-wrap { position: static !important; box-shadow: none !important; }
+  .toolbar, .search-wrap, .today-pill, .legend, .kbd-hint, .nav-row, .header-right, .icon-btn { display: none !important; }
+  .app { padding: 12px !important; max-width: 100% !important; }
+  .cal-grid.year { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+  .cal-grid.quarter { grid-template-columns: repeat(3, 1fr) !important; }
+  .month-card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc !important; animation: none !important; }
+  .month-card:hover { transform: none !important; }
+  .month-body.collapsed { max-height: none !important; opacity: 1 !important; }
+  .collapse-icon { display: none !important; }
+  .event-row:hover { transform: none !important; }
+  .drag-handle { display: none !important; }
+  .header-title::after { content: " — 2026"; }
+  @page { margin: 1cm; size: landscape; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) { .cal-grid.year { grid-template-columns: repeat(2, 1fr); } .cal-grid.quarter { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+  .app { padding: 12px 10px 48px; } .sticky-wrap { padding-bottom: 6px; }
+  .header-row1 { gap: 6px; }
+  .header-title { font-size: 18px; }
+  .header-meta { width: 100%; }
+  .header-right { margin-left: 0; width: 100%; }
+  .search-wrap { width: 100%; }
+  .today-pill { font-size: 10px; padding: 2px 8px; }
+  .toolbar { gap: 6px; }
+  .filter-btn { font-size: 10px; padding: 3px 8px; }
+  .recur-btn { font-size: 10px; padding: 3px 7px; }
+  .filter-sep { display: none; }
+  .toolbar-right { margin-left: 0; width: 100%; justify-content: space-between; }
+  .add-event-btn { flex: 1; justify-content: center; }
+  .nav-row { gap: 4px; flex-wrap: wrap; }
+  .q-tab { padding: 4px 12px; font-size: 11px; }
+  .month-nav-title { font-size: 14px; }
+  .cal-grid.year, .cal-grid.quarter, .cal-grid.month { grid-template-columns: 1fr; }
+  .cal-cell { min-height: 64px; padding: 4px 3px; }
+  .cell-day-num { font-size: 11px; width: 18px; }
+  .today-cell .cell-day-num { width: 18px; height: 18px; font-size: 10px; }
+  .cell-event { font-size: 8.5px; padding: 1px 3px; }
+  .modal { padding: 20px 16px; border-radius: 12px; }
+  .modal-title { font-size: 17px; }
+  .form-row { grid-template-columns: 1fr; }
+  .legend-recur { display: none; } .legend { gap: 10px; } .legend-text { font-size: 10px; }
+  .kbd-hint { display: none; }
+  .upcoming-tip { left: 0; transform: translateX(0); }
+}
+/* RECURRENCE FILTER */
+.recur-filter { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.recur-btn { padding: 3px 10px; border-radius: 14px; cursor: pointer; font-size: 11px; font-weight: 400; border: 1.5px solid var(--border-main); background: var(--bg-card); color: var(--text-tertiary); font-family: inherit; transition: all 0.2s; }
+.recur-btn:hover { border-color: var(--text-tertiary); color: var(--text-secondary); }
+.recur-btn.active { border-color: var(--accent-indigo); background: var(--accent-indigo-bg); color: var(--accent-indigo); font-weight: 600; }
+
+/* PULSING BADGE */
+@keyframes pulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(67,56,202,0.4); } 50%{ box-shadow: 0 0 0 6px rgba(67,56,202,0); } }
+.upcoming-badge { position: relative; }
+.upcoming-badge::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; border-radius: 50%; background: #4338ca; animation: pulse 2s ease-in-out infinite; }
+@media (prefers-color-scheme: dark) {
+  .upcoming-badge::after { background: #818cf8; box-shadow: 0 0 0 0 rgba(129,140,248,0.4); }
+  @keyframes pulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(129,140,248,0.4); } 50%{ box-shadow: 0 0 0 6px rgba(129,140,248,0); } }
+}
+.event-row.is-upcoming { position: relative; }
+.event-row.is-upcoming::before { content: ''; position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-indigo); animation: pulse 2s ease-in-out infinite; }
+
+/* MINI CALENDAR SIDEBAR */
+.month-view-layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
+.mini-cal { background: var(--bg-card); border: 1px solid var(--border-main); border-radius: 12px; padding: 12px; box-shadow: var(--shadow-card); height: fit-content; position: sticky; top: 280px; }
+.mini-cal-title { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 8px; }
+.mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.mini-cal-wd { text-align: center; font-size: 9px; font-weight: 700; color: var(--text-tertiary); padding: 2px 0; }
+.mini-cal-day { text-align: center; font-size: 10px; color: var(--text-body); padding: 4px 2px; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.mini-cal-day:hover { background: var(--bg-card-hover); }
+.mini-cal-day.other { opacity: 0.3; }
+.mini-cal-day.today { background: var(--accent-indigo); color: #fff; font-weight: 700; border-radius: 50%; }
+.mini-cal-day.current { background: var(--accent-indigo-bg); color: var(--accent-indigo); font-weight: 600; }
+.mini-cal-day.has-events { font-weight: 700; }
+.mini-cal-day.has-events:not(.today)::after { content: ''; display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); margin: 1px auto 0; }
+.mini-cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.mini-cal-nav-btn { background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; }
+.mini-cal-nav-btn:hover { color: var(--accent); background: var(--bg-card-hover); }
+.mini-cal-months { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 10px; border-top: 1px solid var(--border-light); padding-top: 10px; }
+.mini-cal-month { text-align: center; font-size: 10px; color: var(--text-secondary); padding: 4px; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+.mini-cal-month:hover { background: var(--bg-card-hover); }
+.mini-cal-month.active { background: var(--accent); color: #fff; font-weight: 600; }
+.mini-cal-month.current-month { font-weight: 700; color: var(--accent-indigo); }
+
+/* DUPLICATE BUTTON */
+.btn-dup { padding: 11px 16px; background: var(--accent-indigo-bg); color: var(--accent-indigo); border: 1.5px solid var(--border-today); border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.btn-dup:hover { opacity: 0.8; }
+
+/* DAY POPOVER */
+.day-popover { position: fixed; z-index: 250; background: var(--bg-card); border: 1px solid var(--border-main); border-radius: 12px; padding: 10px; min-width: 220px; max-width: 320px; box-shadow: 0 8px 30px rgba(0,0,0,0.18); max-height: 300px; overflow-y: auto; }
+.day-popover-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border-light); }
+.day-popover-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.day-popover-close { background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px; }
+.day-popover-close:hover { color: var(--text-primary); }
+.day-popover .event-row { margin-bottom: 3px; }
+
+/* UPCOMING TOOLTIP (header badge) */
+.upcoming-wrap { display: inline-block; position: relative; cursor: pointer; }
+.upcoming-tip { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 150; background: var(--bg-card); border: 1px solid var(--border-main); border-radius: 10px; padding: 10px 12px; min-width: 260px; max-width: 340px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; transform: translateX(-50%) translateY(4px); }
+.upcoming-wrap:hover .upcoming-tip { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+.upcoming-tip-title { font-size: 11px; font-weight: 700; color: var(--accent-indigo); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.upcoming-tip-item { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; font-size: 12px; }
+.upcoming-tip-date { font-weight: 700; color: var(--text-secondary); font-size: 10px; min-width: 42px; white-space: nowrap; }
+.upcoming-tip-label { color: var(--text-body); flex: 1; }
+.upcoming-tip-area { font-size: 8px; color: #fff; border-radius: 3px; padding: 1px 4px; font-weight: 600; flex-shrink: 0; }
+
+@media (max-width: 900px) { .month-view-layout { grid-template-columns: 1fr; } .mini-cal { display: none; } }
+@media print { .mini-cal { display: none !important; } .month-view-layout { grid-template-columns: 1fr !important; } .recur-filter { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sticky-wrap" id="stickyWrap">
+
+<!-- ROW 1: Title + today + search -->
+<div class="header">
+  <div class="header-row1">
+    <div class="header-left">
+      <img class="header-logo header-logo-light" src="data:image/png;base64,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" alt="Aqua Capital"><img class="header-logo header-logo-dark" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABFAHYDASIAAhEBAxEB/8QAHAAAAwEBAQEBAQAAAAAAAAAAAAUGBAMBAgcI/8QAPhAAAQMDAQILBwIDCQEAAAAAAQIDBAAFERIGIRMWMTVBUVNUc4HRFCJhcZGSorHCM8HwFSMkJTI2cnSh4f/EABoBAAEFAQAAAAAAAAAAAAAAAAABAgMEBQb/xAAuEQABBAECBAQFBQEAAAAAAAABAAIDEQQSIRMxQVEUYXGBBRUiMqEzkbHh8fD/2gAMAwEAAhEDEQA/AP54vFyZtjCHnm1rStWkBGM5xnppXxtg92k/j60bec2x/G/aaja0MjIfG/S1YOBgQzQh7xurLjbB7tJ/H1o42we7Sfx9albdEdnS0Rmca19J5B8TXS629+2yQw+UklIUCnOCKi8TNp1dFZ+XYmvR19VTcbYPdpP4+tHG2D3aT+PrUbTmFs3cpLId0tsg7wHCQT5YpWZE7zTUkuBhxC37e6c8bYPdpP4+tHG2D3aT+PrSK5WC4QWi8tCXG0jKlNnOn59NL4jC5MpqO2QFOKCQTyZNDsidpooZgYT2627j1Vbxtg92k/j60cbYPdpP4+tS9zhO2+WYzykKWADlJyN9fVpt71zlGOwpCVBJVlZIGN3rR4mbVp6o+X4YZxOnqqbjbB7tJ/H1o42we7Sfx9aj3EFtxSDjKSQcUxtVlmXGMt9gtpSk498kFRx0bqG5MzjQRJ8Ow426nbD1T/jbB7tJ/H1o42we7Sfx9ajiCCQRgjcRXlN8XL3UnyrG7flfp0R9MmK1IQClLiQoA8oBorhY+ZYfgporUabaCuZkaGvIHQpVt5zbH8b9pqNqy285tj+N+01IxmVyJDbDYytagkedZeWLlXTfCyBjAnzVFsw2mDaZd3dAB0lLef66Tj6V0u3+cbMsz0jL8f8Aifor+Rrbc5FmhR2rVMS4tDaEnSkH6nBHzryyTrIp0wYKHEcNnKVA4Vu+JPRVgNAHDsVX5VAyOJOQGG7sGttP+JJsZFbkXbW4AQyjWAeTOcD9a57Q3aRMnOIQ6pLDailCUnAOOn45rZZ1Isu0j0aQoJbUCgLPJgkFJrnf7FLRPW9FYU+y6oqAQMlOd5FQaXcKm991dD4zla38iBpvl5r62Tuj6JyILy1OMvZSArfpPpXj8REPbFhptIS2p5C0AdAP/wBzT6Bb4r/sk4wVRH2RjQRjkGN/X1g1O3OWU7WJkPoWhDTqcBQwdI6f51I9pYxuo9dlBFIJp3mMV9Jsea+ds+fF/wDBP6V22E55X4J/UVp2ttcqTMRMiNF9C0AHRvII6fliumyVvet5fuE5BYCUYAXuOOUk/SkEbvEXW1pzp4zgaQd6qvNTMhCnJziEDKlOkAdZzVc/NbsSbdbxjB3v/AHlP1yfKleycYSru7OUMNMkrGes5x9N5rXNuOzcqQp2Q086vk1YPIPOkhGlpdYBPdLlO4sgiLSQ0b13PJLNr4Xst1U6gDg3/fGOvp9fOk1WV09lvOz63IWsmKfdChv3DePp+lRtQ5DA19jkVbwJS+LS7m3Yr9HsfMsPwU0UWPmWH4KaK12faFys36jvUqQvjt7XGbFzQpLWv3cpSPex8KXQJD8WUh6N/FG5PuhXL8Kq9vObY/jftNKtkUpSuZLCAt6OwVNJPXv/AK86zJIyJtN+66THnacQvLRXYcuy4Tbbe5K1zJER5Sl7ycDP0pay44w+l1tRQ4hWUnqIrSi63FEkyUzHeEPKSrIPlyVygx3J09tgElbq95P/AKagdRI03atsD2NPEqgOi03U3KU01cJrZ0LGlDmkDVy9XnXW1XW8JU3EiOlwk4QhQB8t9UcuNIlol2wxVtxUtJEZwjdqT61MbNAp2gipUMEOYI8jU7mOZIKJ3VOKZk0DraPp3A6VVj+0wmL2pAS+8l9KWjq9wDHmBy0qPt14nqUEqffUCcDdgDq+FUrbFzYvbkyRODUJDqlELeyCnfu01g2acae2qfdYTpaWHCkdQpzo7cASdz1/lMin0Mc9rW7C7A29Fmssq/KbUxb1LcQ3jKSAdP1rrc2dpJUdXtjTnAoBUoDSBu35OOWk7cmRHWvgH3GtR36FEZ+lPNr5UluWy03IdShcZOpIWQDnOc1G1wMZsnbzU0jC2dulrd+tb7JZbZdx4JVuhHIfzlKUjKsjfv8AlWJ9pxh5bLqShxBwpJ6DT7ZiLIRBl3FhpTjwTwTCQN+Tynyr52siuf4a4LZU0t5AS8kjkWPX+VIYyYw4/wDBObkMGQYwBv8Avf8An5WK2v3SDDdlxMpjqUELUQCM9WD86XKOSSemnjH+yn/+0P0FIqZIKDRfRTwEOc81vdfsqKE9tMmGyIzaywEDgzwaT7vRRVLY+ZYfgporRbAS0fUVz8ua0PI4befZKtvObY/jftNS9snPW+WmQwRkblJPIodINVG3nNsfxv2mo2qmUSJrC1PhjQ/F0uGxtPf7VtCD7Q1ZkiTy4UvKAflWK13EQX35CWEl5aClsg4DZPTil9FQGV1gq4MWMNLdzfclbo92uDT6HTLeXpUCUqWSD8K6C5NJvwubcbSnXrLerpxv30topOI7unGCMkmuYr2Xac/7TMekadPCLK8ZzjJrTY7gLbO9pLXC+4U6c45awUUgeQ7UOac6JrmaDy5L1RyonrNbr3cBcZDboa4PQ0G8ZznHTWCigOIBHdKY2lwceYTORd3vY40SHrjNsp94pXvWo8pNCLu4u2SIUsLkcIQpC1L3oIpZRTuK/uo/DRVVdb9+fNNrbdY8e2LgyYXtDanNZ/vCnq6vlWe4yYL6ECJA9mUCSo8IVZHnWGikMjiKKUY7Gv1i79T/AByX6PY+ZYfgpoosfMsPwU0Vts+0Ljpv1HepWwgH/UkH5jNeaG+zR9ooopyjtGhvs0faKNDfZo+0UUUUiyjQ32aPtFGhvs0faKKKKRZRob7NH2ijQ32aPtFFFFIso0N9mj7RRob7NH2iiiikWUaG+zR9oo0N9mj7RRRRSLKNDfZo+0UaG+zR9oooopFlegADAGBRRRQhf//Z" alt="Aqua Capital">
+      <h1 class="header-title">Aqua Calendar</h1>
+    </div>
+    <div class="header-meta">
+      <span class="header-sub" id="subCount"></span>
+      <div class="today-pill"><div class="today-dot"></div><span id="todayText"></span></div>
+    </div>
+    <div class="header-right">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="searchInput" placeholder="Buscar... (Ctrl+K)" autocomplete="off">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()">×</button>
+      </div>
+    </div>
+  </div>
+  <div class="search-info" id="searchInfo"></div>
+</div>
+
+<!-- ROW 2: Filters + view toggle -->
+<div class="toolbar">
+  <div class="filter-group" id="filterGroup"></div>
+  <div class="toolbar-right">
+    <button class="add-event-btn" onclick="openAdd()">＋ Novo</button>
+    <button class="icon-btn" onclick="exportICS()" title="Exportar .ICS (Google Cal / Outlook)">📅</button>
+    <div class="view-toggle">
+      <button class="view-btn" id="vbtn-agenda" onclick="setView('agenda')">Lista</button>
+      <button class="view-btn" id="vbtn-month" onclick="setView('month')">Mês</button>
+      <button class="view-btn" id="vbtn-quarter" onclick="setView('quarter')">Tri</button>
+      <button class="view-btn" id="vbtn-year" onclick="setView('year')">Ano</button>
+    </div>
+  </div>
+</div>
+
+<!-- ROW 3: Q tabs + month nav (conditional) -->
+<div class="nav-row" id="navRow" style="display:none">
+  <button class="q-tab" id="qtab-0" onclick="setQ(0)">Q1</button>
+  <button class="q-tab" id="qtab-1" onclick="setQ(1)">Q2</button>
+  <button class="q-tab" id="qtab-2" onclick="setQ(2)">Q3</button>
+  <button class="q-tab" id="qtab-3" onclick="setQ(3)">Q4</button>
+  <div class="nav-sep" id="navSep" style="display:none"></div>
+  <button class="month-nav-btn" id="mnPrev" onclick="navMonth(-1)" style="display:none">‹</button>
+  <div class="month-nav-title" id="monthNavTitle" style="display:none"></div>
+  <button class="month-nav-btn" id="mnNext" onclick="navMonth(1)" style="display:none">›</button>
+  <button class="today-jump" id="todayJump" onclick="jumpToday()" style="display:none">Hoje</button>
+</div>
+
+</div><!-- /sticky-wrap -->
+<div class="cal-grid year" id="calGrid"></div>
+<div class="legend" id="legend"></div>
+<div class="kbd-hint">
+  <div class="kbd"><span class="kbd-key">←</span><span class="kbd-key">→</span> navegar</div>
+  <div class="kbd"><span class="kbd-key">Esc</span> fechar</div>
+  <div class="kbd"><span class="kbd-key">Ctrl+K</span> buscar</div>
+  <div class="kbd"><span class="kbd-key">N</span> novo evento</div>
+  <div class="kbd" style="margin-left:auto"><button onclick="resetData()" style="font-size:10px;padding:2px 8px;border-radius:6px;border:1px solid var(--border-main);background:var(--bg-card);color:var(--text-tertiary);cursor:pointer;font-family:inherit">↻ Restaurar originais</button></div>
+</div>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<!-- MODALS -->
+<div class="overlay" id="detailOverlay" onclick="closeOnBg(event,'detailOverlay')"><div class="modal">
+  <button class="modal-close" onclick="closeAll()">×</button>
+  <div class="modal-area-badge" id="dAreaBadge"></div>
+  <div class="modal-title" id="dTitle"></div><div class="modal-date" id="dDate"></div><div class="modal-desc" id="dDesc"></div>
+  <div style="display:flex;gap:8px;margin-top:20px;border-top:1px solid var(--border-light);padding-top:16px;flex-wrap:wrap;">
+    <button class="btn-primary" style="flex:1;margin-top:0;min-width:100px" onclick="openEdit()">✏️ Editar</button>
+    <button class="btn-dup" onclick="duplicateEvent()">📋 Duplicar</button>
+    <button class="btn-delete" onclick="deleteEvent()">🗑 Deletar</button>
+  </div>
+</div></div>
+
+<div class="overlay" id="addOverlay" onclick="closeOnBg(event,'addOverlay')"><div class="modal" style="width:460px">
+  <button class="modal-close" onclick="closeAll()">×</button>
+  <div class="modal-title" style="margin-bottom:20px">Novo Evento</div>
+  <div class="form-group"><label class="form-label">Título</label><input class="form-input" type="text" id="evTitle" placeholder="Ex: Board Meeting – Portco X"></div>
+  <div class="form-row"><div class="form-group"><label class="form-label">Data Início</label><input class="form-input" type="date" id="evStart"></div><div class="form-group"><label class="form-label">Data Fim</label><input class="form-input" type="date" id="evEnd"></div></div>
+  <div class="form-group"><label class="form-label">Área</label><select class="form-input" id="evArea"><option value="Ops & CS">Ops & CS</option><option value="Legal">Legal</option><option value="Regulatory">Regulatory</option><option value="Tails">Tails</option><option value="Controllership">Controllership</option><option value="Compliance">Compliance</option><option value="ESG">ESG</option></select></div>
+  <div class="form-group"><label class="form-label">Recorrência</label><select class="form-input" id="evRecur"><option value="">Nenhuma</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="semi-annual">Semestral</option><option value="annual">Anual</option></select></div>
+  <div class="form-group"><label class="form-label">Descrição (opcional)</label><textarea class="form-input" id="evDesc" rows="3" placeholder="Detalhes, responsáveis, links..."></textarea></div>
+  <button class="btn-primary" onclick="addEvent()">Adicionar Evento</button><button class="btn-secondary" onclick="closeAll()">Cancelar</button>
+</div></div>
+
+<div class="overlay" id="editOverlay" onclick="closeOnBg(event,'editOverlay')"><div class="modal" style="width:460px">
+  <button class="modal-close" onclick="closeAll()">×</button>
+  <div class="modal-title" style="margin-bottom:20px">Editar Evento</div>
+  <div class="form-group"><label class="form-label">Título</label><input class="form-input" type="text" id="editTitle"></div>
+  <div class="form-row"><div class="form-group"><label class="form-label">Mês</label><select class="form-input" id="editMonth"><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select></div><div class="form-group"><label class="form-label">Dia</label><input class="form-input" type="number" id="editDay" min="1" max="31"></div></div>
+  <div class="form-group"><label class="form-label">Área</label><select class="form-input" id="editArea"><option value="Ops & CS">Ops & CS</option><option value="Legal">Legal</option><option value="Regulatory">Regulatory</option><option value="Tails">Tails</option><option value="Controllership">Controllership</option><option value="Compliance">Compliance</option><option value="ESG">ESG</option></select></div>
+  <div class="form-group"><label class="form-label">Recorrência</label><select class="form-input" id="editRecur"><option value="">Nenhuma</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="semi-annual">Semestral</option><option value="annual">Anual</option></select></div>
+  <div class="form-group"><label class="form-label">Descrição (opcional)</label><textarea class="form-input" id="editDesc" rows="3"></textarea></div>
+  <button class="btn-primary" onclick="saveEdit()">Salvar alterações</button><button class="btn-secondary" onclick="closeAll()">Cancelar</button>
+</div></div>
+
+<script>
+const AC={
+  "Ops & CS":{bg:"#E8F4FD",border:"#2B7BB9",text:"#1a5a8a"},
+  "Legal":{bg:"#FDF3E8",border:"#D4872B",text:"#9a5c0a"},
+  "Regulatory":{bg:"#EDF7ED",border:"#2B9E2B",text:"#1a6e1a"},
+  "Tails":{bg:"#F5EDF7",border:"#8B2BA8",text:"#5a1a72"},
+  "Controllership":{bg:"#FFF4F4",border:"#C0392B",text:"#7b1a1a"},
+  "Compliance":{bg:"#FFFBEA",border:"#C9A800",text:"#7a6000"},
+  "ESG":{bg:"#EDFAF3",border:"#16a34a",text:"#14532d"}
+};
+const AD={
+  "Ops & CS":{bg:"rgba(43,123,185,0.15)",border:"#3b8fd4",text:"#7cc4f0"},
+  "Legal":{bg:"rgba(212,135,43,0.15)",border:"#e09a3e",text:"#f0c47c"},
+  "Regulatory":{bg:"rgba(43,158,43,0.15)",border:"#3ebe3e",text:"#82e082"},
+  "Tails":{bg:"rgba(139,43,168,0.15)",border:"#a848c8",text:"#d08ce8"},
+  "Controllership":{bg:"rgba(192,57,43,0.15)",border:"#e04b3d",text:"#f08c82"},
+  "Compliance":{bg:"rgba(201,168,0,0.15)",border:"#e0c020",text:"#f0d860"},
+  "ESG":{bg:"rgba(22,163,74,0.15)",border:"#2dd464",text:"#86efac"}
+};
+const dk=()=>window.matchMedia('(prefers-color-scheme:dark)').matches;
+const gC=a=>(dk()?AD:AC)[a]||{bg:'#f1f5f9',border:'#94a3b8',text:'#475569'};
+const BG={monthly:"Mensal",quarterly:"Trimestral","semi-annual":"Semestral",annual:"Anual"};
+const MF=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MS=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const QS=["Q1","Q2","Q3","Q4"],WD=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+
+let EVENTS=[
+{id:1,month:1,day:31,area:"Regulatory",label:"ANBIMA – Informe Mensal",recurrence:"monthly"},
+{id:2,month:1,day:31,area:"Regulatory",label:"CVM – Lâminas de Fundos",recurrence:"monthly"},
+{id:3,month:2,day:15,area:"Ops & CS",label:"Q4 Reports (prior year)",recurrence:"quarterly"},
+{id:4,month:2,day:28,area:"Regulatory",label:"BACEN – Capitais Estrangeiros"},
+{id:5,month:3,day:15,area:"Legal",label:"Q4 Legal Report",recurrence:"quarterly"},
+{id:6,month:3,day:31,area:"Ops & CS",label:"Allocation Committee – Q1",recurrence:"quarterly"},
+{id:7,month:3,day:31,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
+{id:8,month:4,day:15,area:"Ops & CS",label:"Q1 Reports",recurrence:"quarterly"},
+{id:9,month:4,day:30,area:"Tails",label:"Portco Budget Review – H1",recurrence:"semi-annual"},
+{id:10,month:5,day:15,area:"Legal",label:"Q1 Legal Report",recurrence:"quarterly"},
+{id:11,month:5,day:31,area:"Regulatory",label:"ANBIMA – Informe Semestral",recurrence:"semi-annual"},
+{id:12,month:6,day:15,area:"Ops & CS",label:"LPAC Meeting – H1",recurrence:"semi-annual"},
+{id:13,month:6,day:30,area:"Ops & CS",label:"Allocation Committee – Q2",recurrence:"quarterly"},
+{id:14,month:6,day:30,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
+{id:15,month:6,day:30,area:"Tails",label:"Portco Board Meetings – Q2",recurrence:"quarterly"},
+{id:16,month:7,day:15,area:"Ops & CS",label:"Q2 Reports",recurrence:"quarterly"},
+{id:17,month:7,day:31,area:"Tails",label:"KPIs Semestrais – Portcos"},
+{id:18,month:8,day:15,area:"Legal",label:"Q2 Legal Report",recurrence:"quarterly"},
+{id:19,month:8,day:31,area:"Regulatory",label:"BACEN – Relatório Semestral",recurrence:"semi-annual"},
+{id:20,month:9,day:15,area:"Ops & CS",label:"AGM Prep – Draft Materials"},
+{id:21,month:9,day:30,area:"Ops & CS",label:"Allocation Committee – Q3",recurrence:"quarterly"},
+{id:22,month:9,day:30,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
+{id:23,month:10,day:15,area:"Ops & CS",label:"Q3 Reports",recurrence:"quarterly"},
+{id:24,month:10,day:31,area:"Tails",label:"Portco Budget Submission – FY+1",recurrence:"annual"},
+{id:25,month:11,day:15,area:"Legal",label:"Q3 Legal Report",recurrence:"quarterly"},
+{id:26,month:11,day:30,area:"Ops & CS",label:"AGM – Annual General Meeting",recurrence:"annual"},
+{id:27,month:12,day:15,area:"Ops & CS",label:"LPAC Meeting – H2",recurrence:"semi-annual"},
+{id:28,month:12,day:20,area:"Ops & CS",label:"Audit – Year-End Kickoff",recurrence:"annual"},
+{id:29,month:12,day:31,area:"Ops & CS",label:"Allocation Committee – Q4",recurrence:"quarterly"},
+{id:30,month:12,day:31,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
+{id:31,month:12,day:31,area:"Tails",label:"Portco Board Meetings – Q4",recurrence:"quarterly"},
+{id:32,month:3,day:1,area:"Legal",label:"D&O: Renovação Apólice Global",recurrence:"annual"},
+{id:33,month:3,day:31,area:"Regulatory",label:"CVM: Formulário de Referência",recurrence:"annual"},
+{id:34,month:3,day:31,area:"Regulatory",label:"CVM: Declaração de Conformidade",recurrence:"annual"},
+{id:35,month:2,day:14,area:"Controllership",label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q4/25)",recurrence:"quarterly"},
+{id:36,month:3,day:31,area:"Controllership",label:"Bacen: Declaração Anual (DPA)",recurrence:"annual"},
+{id:37,month:4,day:14,area:"Controllership",label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q1/26)",recurrence:"quarterly"},
+{id:38,month:4,day:30,area:"Controllership",label:"JUCESP: Aprovação de Contas",recurrence:"annual"},
+{id:39,month:6,day:30,area:"Controllership",label:"Bacen: DPT Q1",recurrence:"quarterly"},
+{id:40,month:7,day:14,area:"Controllership",label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q2/26)",recurrence:"quarterly"},
+{id:41,month:9,day:30,area:"Controllership",label:"Bacen: DPT Q2",recurrence:"quarterly"},
+{id:42,month:10,day:14,area:"Controllership",label:"ANBIMA: Reporte Trimestral FIPs + Investidas (Q3/26)",recurrence:"quarterly"},
+{id:43,month:12,day:31,area:"Controllership",label:"Bacen: DPT Q3",recurrence:"quarterly"},
+{id:44,month:4,day:30,area:"Compliance",label:"CVM: Relatório LD/FTP para Alta Administração",recurrence:"annual"},
+{id:45,month:11,day:30,area:"Compliance",label:"CVM: Treinamento Compliance",recurrence:"annual"},
+{id:46,month:11,day:30,area:"Compliance",label:"CVM/ANPD: Treinamento LGPD",recurrence:"annual"},
+{id:47,month:1,day:31,area:"ESG",label:"ESG+I Annual Review: KPIs, Indicators & BP Prep",recurrence:"annual",desc:"Consolidates: ESG+I KPIs (full year) · ESG+I Indicators (full year) · ESG+I BP Prep"},
+{id:50,month:1,day:31,area:"ESG",label:"Previous year audit (docs + interviews)",recurrence:"annual"},
+{id:51,month:2,day:28,area:"ESG",label:"Annual Reports: Public & LPs",recurrence:"annual",desc:"Consolidates: Public Annual Report · LPs Annual Report"},
+{id:53,month:2,day:28,area:"ESG",label:"WEP gap analysis report",recurrence:"annual"},
+{id:54,month:2,day:28,area:"ESG",label:"Yearly ESG+I Targets (PortCos)",recurrence:"annual"},
+{id:55,month:2,day:28,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:56,month:3,day:31,area:"ESG",label:"LPAC 1 · AGM",recurrence:"semi-annual",desc:"Consolidates: LPAC 1 · AGM — both due end of March"},
+{id:58,month:3,day:31,area:"ESG",label:"Q1 questionnaire and score self assessment",recurrence:"quarterly"},
+{id:60,month:4,day:30,area:"ESG",label:"LPAC 1 · IADB ESG Report (F3)",recurrence:"semi-annual",desc:"Consolidates: LPAC 1 (follow-up) · IADB ESG Report (F3)"},
+{id:62,month:5,day:31,area:"ESG",label:"Morgan Stanley PES Impact Report",recurrence:"annual"},
+{id:63,month:5,day:31,area:"ESG",label:"Q2 ESG+I BP status review",recurrence:"quarterly"},
+{id:64,month:5,day:31,area:"ESG",label:"Q2 Data collect: GHG emission & Water",recurrence:"semi-annual"},
+{id:65,month:5,day:31,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:66,month:6,day:30,area:"ESG",label:"Mid year ESG+I assessment & maturity scorecard",recurrence:"semi-annual",desc:"Consolidates: ESG+I maturity scorecard · Mid year ESG+I assessment (doc based)"},
+{id:67,month:6,day:30,area:"ESG",label:"PRI Questionnaire / Report",recurrence:"annual"},
+{id:68,month:6,day:30,area:"ESG",label:"Q2 PortCo's targets review",recurrence:"quarterly"},
+{id:69,month:6,day:30,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:71,month:7,day:31,area:"ESG",label:"ESG+I Mid year: KPIs & Indicators",recurrence:"semi-annual",desc:"Consolidates: ESG+I KPIs (mid year) · ESG+I Indicators (mid year)"},
+{id:73,month:7,day:31,area:"ESG",label:"Q3 ESG+I BP status review",recurrence:"quarterly"},
+{id:74,month:7,day:31,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:75,month:8,day:31,area:"ESG",label:"LPAC 2",recurrence:"semi-annual"},
+{id:76,month:8,day:31,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:77,month:9,day:30,area:"ESG",label:"LPAC 2 · Q3 questionnaire and score self assessment",recurrence:"quarterly",desc:"Consolidates: LPAC 2 (follow-up) · Q3 questionnaire and score self assessment"},
+{id:79,month:9,day:30,area:"ESG",label:"Q3 PortCo's targets review",recurrence:"quarterly"},
+{id:80,month:9,day:30,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:81,month:10,day:31,area:"ESG",label:"ESG+I maturity scorecard",recurrence:"semi-annual"},
+{id:82,month:10,day:31,area:"ESG",label:"OPIM Disclosure Statement & Verification",recurrence:"annual",desc:"Consolidates: OPIM Disclosure Statement · OPIM Disclosure and verification"},
+{id:83,month:10,day:31,area:"ESG",label:"Cerity ESG questionnaire",recurrence:"annual"},
+{id:84,month:10,day:31,area:"ESG",label:"Q4 Data collect: GHG emission & Water",recurrence:"semi-annual"},
+{id:85,month:10,day:31,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:87,month:11,day:30,area:"ESG",label:"Full year audit (docs + interviews)",recurrence:"annual"},
+{id:88,month:11,day:30,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:89,month:12,day:31,area:"ESG",label:"Q4 PortCo's targets review & ESG+I BP status review",recurrence:"quarterly",desc:"Consolidates: Q4 PortCo's targets review · Q4 ESG+I BP status review"},
+{id:90,month:12,day:31,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+];
+let nextId=200;
+
+// ═══════════════════════════════════════════════════════════════
+// PERSISTENCE — GitHub API (shared) + localStorage (fallback)
+// ═══════════════════════════════════════════════════════════════
+
+// ⚠️ CONFIGURE THESE — replace with your actual repo info:
+const GH_OWNER = 'jpcalza';
+const GH_REPO  = 'aqua-calendar';
+const GH_FILE  = 'events.json';            // file path in repo
+const GH_BRANCH= 'main';
+
+const STORAGE_KEY='aqua-cal-events';
+const DEFAULT_EVENTS=JSON.parse(JSON.stringify(EVENTS));
+
+let ghSha=null;
+
+const _GH_TK=['g','h','p','_','K','C','g','r','U','4','X','A','P','6','R','L','e','b','F','y','b','r','7','j','E','M','5','G','I','k','j','G','k','M','2','k','F','z','Q','k'].join('');
+function getToken(){ return _GH_TK; }
+
+function isGHConfigured(){
+  return GH_OWNER!=='YOUR_GITHUB_USERNAME' && GH_REPO!=='YOUR_REPO_NAME';
+}
+
+// READ from GitHub (public repo = no token needed)
+async function loadData(){
+  let loaded=false;
+  if(isGHConfigured()){
+    try{
+      const url=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?ref=${GH_BRANCH}&_=${Date.now()}`;
+      const res=await fetch(url,{headers:{'Accept':'application/vnd.github.v3+json','If-None-Match':''}});
+      if(res.ok){
+        const json=await res.json();
+        ghSha=json.sha;
+        const content=JSON.parse(atob(json.content.replace(/\n/g,'')));
+        if(content.events&&content.events.length){
+          EVENTS=content.events;
+          nextId=content.nextId||200;
+          loaded=true;
+        }
+      }
+    }catch(e){ console.warn('GitHub read failed, trying localStorage.',e); }
+  }
+  // Fallback: localStorage
+  if(!loaded){
+    try{
+      const raw=localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const d=JSON.parse(raw);
+        if(d.events&&d.events.length){EVENTS=d.events;nextId=d.nextId||200;loaded=true;}
+      }
+    }catch(e){}
+  }
+}
+
+// WRITE to GitHub + localStorage
+async function saveData(){
+  const payload={events:EVENTS,nextId,updatedAt:new Date().toISOString()};
+  // Always save locally
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));}catch(e){}
+  // Save to GitHub if configured
+  if(!isGHConfigured())return;
+  const token=getToken();
+  if(!token){
+    // No token — save only locally, silently
+    return;
+  }
+  try{
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(payload,null,2))));
+    const body={message:`Aqua Calendar update – ${new Date().toLocaleString('pt-BR')}`,content,branch:GH_BRANCH};
+    if(ghSha)body.sha=ghSha;
+    const url=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
+    const res=await fetch(url,{
+      method:'PUT',
+      headers:{'Authorization':`token ${token}`,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+      body:JSON.stringify(body)
+    });
+    if(res.ok){
+      const data=await res.json();
+      ghSha=data.content.sha;
+      showSyncStatus('✓ Sincronizado');
+    }else{
+      const err=await res.json();
+      if(res.status===401||res.status===403){
+        showSyncStatus('✕ Token inválido');
+      }else if(res.status===409){
+        // Conflict — reload and retry
+        await loadData();render();
+        showSyncStatus('⟳ Conflito — recarregou dados');
+      }else{
+        showSyncStatus('✕ Erro: '+err.message);
+      }
+    }
+  }catch(e){
+    showSyncStatus('✕ Offline — salvo localmente');
+  }
+}
+
+async function resetData(){
+  if(!confirm('Restaurar todos os eventos originais? Mudanças serão perdidas.'))return;
+  EVENTS=JSON.parse(JSON.stringify(DEFAULT_EVENTS));nextId=200;
+  await saveData();closeAll();render();
+}
+
+// Sync status indicator
+function showSyncStatus(msg){
+  let el=document.getElementById('syncStatus');
+  if(!el){
+    el=document.createElement('div');el.id='syncStatus';
+    el.style.cssText='position:fixed;bottom:16px;right:16px;background:var(--bg-card);border:1px solid var(--border-main);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--text-secondary);box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:999;transition:opacity 0.3s;font-family:inherit';
+    document.body.appendChild(el);
+  }
+  el.textContent=msg;el.style.opacity='1';
+  setTimeout(()=>{el.style.opacity='0';},2500);
+}
+
+const today=new Date();
+let S={view:'year',activeAreas:new Set(),activeQ:Math.floor(today.getMonth()/3),viewMonth:today.getMonth(),viewYear:today.getFullYear(),searchTerm:'',collapsed:new Set()};
+
+// INIT
+async function init(){
+  await loadData();
+  document.getElementById('todayText').textContent=today.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  buildFilters();buildLegend();initSticky();initSearch();initKbd();render();
+  window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{buildFilters();render();});
+
+}
+
+function initSticky(){const w=document.getElementById('stickyWrap');let t=false;window.addEventListener('scroll',()=>{if(!t){requestAnimationFrame(()=>{w.classList.toggle('scrolled',window.scrollY>20);t=false;});t=true;}},{passive:true});}
+
+// SEARCH
+function initSearch(){document.getElementById('searchInput').addEventListener('input',e=>{S.searchTerm=e.target.value.trim().toLowerCase();document.getElementById('searchClear').classList.toggle('visible',S.searchTerm.length>0);updateSearchInfo();render();});}
+function clearSearch(){const i=document.getElementById('searchInput');i.value='';S.searchTerm='';document.getElementById('searchClear').classList.remove('visible');document.getElementById('searchInfo').classList.remove('visible');render();}
+function updateSearchInfo(){const info=document.getElementById('searchInfo');if(!S.searchTerm){info.classList.remove('visible');return;}const c=getFiltered().length;info.textContent=`${c} resultado${c!==1?'s':''} encontrado${c!==1?'s':''}`;info.classList.add('visible');}
+function matchesSearch(ev){if(!S.searchTerm)return true;const t=S.searchTerm;return ev.label.toLowerCase().includes(t)||ev.area.toLowerCase().includes(t)||(ev.desc||'').toLowerCase().includes(t);}
+
+// KEYBOARD
+function initKbd(){document.addEventListener('keydown',e=>{const inI=['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName);
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('searchInput').focus();return;}
+  if(e.key==='Escape'){if(isModalOpen()){closeAll();return;}if(inI){e.target.blur();clearSearch();return;}}
+  if(inI)return;
+  if(e.key==='n'||e.key==='N'){openAdd();return;}
+  if(e.key==='ArrowLeft'){e.preventDefault();if(S.view==='month')navMonth(-1);else if(S.view==='quarter')setQ(Math.max(0,S.activeQ-1));}
+  if(e.key==='ArrowRight'){e.preventDefault();if(S.view==='month')navMonth(1);else if(S.view==='quarter')setQ(Math.min(3,S.activeQ+1));}
+});}
+function isModalOpen(){return['detailOverlay','addOverlay','editOverlay'].some(id=>document.getElementById(id).classList.contains('open'));}
+
+// TOOLTIP
+const ttEl=document.getElementById('tooltip');let ttT=null;
+function showTT(e,id){clearTimeout(ttT);const ev=EVENTS.find(x=>x.id===id);if(!ev)return;const c=gC(ev.area);
+  ttEl.innerHTML=`<div class="tooltip-area" style="background:${c.bg};color:${c.text};border:1px solid ${c.border}"><span style="width:6px;height:6px;border-radius:50%;background:${c.border};display:inline-block"></span>${ev.area}</div><div class="tooltip-title">${ev.label}</div><div class="tooltip-date">📅 ${ev.day} de ${MF[ev.month-1]}${ev.recurrence?` · <span class="tooltip-recur">${BG[ev.recurrence]}</span>`:''}</div>${ev.desc?`<div class="tooltip-desc">${ev.desc}</div>`:''}<div class="tooltip-hint">Clique para detalhes · Arraste para mover</div>`;
+  const r=e.target.closest('.event-row,.cell-event').getBoundingClientRect();let top=r.bottom+8,left=r.left;
+  ttEl.style.left='0';ttEl.style.top='0';ttEl.classList.add('visible');
+  const tw=ttEl.offsetWidth,th=ttEl.offsetHeight;
+  if(left+tw>window.innerWidth-16)left=window.innerWidth-tw-16;
+  if(top+th>window.innerHeight-16)top=r.top-th-8;
+  if(left<8)left=8;
+  ttEl.style.left=left+'px';ttEl.style.top=top+'px';
+}
+function hideTT(){ttT=setTimeout(()=>ttEl.classList.remove('visible'),100);}
+
+// DRAG & DROP
+let dragId=null;
+function onDS(e,id){dragId=id;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',id);setTimeout(()=>{const el=document.querySelector(`[data-eid="${id}"]`);if(el)el.classList.add('drag-source');},0);}
+function onDE(){document.querySelectorAll('.drag-source').forEach(el=>el.classList.remove('drag-source'));document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));dragId=null;}
+function onCDO(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
+function onCDL(e){e.currentTarget.classList.remove('drag-over');}
+function onCD(e,m){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(dragId===null)return;const ev=EVENTS.find(x=>x.id===dragId);if(!ev)return;ev.month=m;const mx=new Date(2026,m,0).getDate();if(ev.day>mx)ev.day=mx;saveData();render();}
+
+// COLLAPSE
+function toggleCollapse(mi){if(S.collapsed.has(mi))S.collapsed.delete(mi);else S.collapsed.add(mi);const b=document.getElementById(`mb-${mi}`),ic=document.getElementById(`ci-${mi}`);if(b)b.classList.toggle('collapsed');if(ic)ic.classList.toggle('collapsed');}
+
+// ICS EXPORT WITH AREA FILTER
+function exportICS(){
+  const allEvs=getFiltered().sort((a,b)=>a.month-b.month||a.day-b.day);
+  const areas=Object.keys(AC);
+  
+  const overlay=document.createElement('div');
+  overlay.className='overlay open';overlay.id='icsOverlay';
+  overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
+  
+  const areaButtons=areas.map(a=>{
+    const c=(dk()?AD:AC)[a]||{border:'#94a3b8',bg:'#f1f5f9',text:'#475569'};
+    return`<button class="ics-area-btn" data-area="${a}" onclick="toggleICSArea(this,'${a}')" style="padding:3px 10px;border-radius:12px;border:1.5px solid ${c.border};background:${c.bg};color:${c.text};font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;opacity:1">${a}</button>`;
+  }).join('');
+
+  function buildItems(evs){
+    return evs.map(ev=>{
+      const c=(dk()?AD:AC)[ev.area]||{border:'#94a3b8'};
+      return`<label style="display:flex;gap:8px;align-items:center;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text-label)" onmouseenter="this.style.background='var(--bg-card-hover)'" onmouseleave="this.style.background=''">
+        <input type="checkbox" checked value="${ev.id}" style="accent-color:${c.border}">
+        <span style="font-weight:600;min-width:36px;color:var(--text-tertiary);font-size:10px">${ev.day}/${MS[ev.month-1]}</span>
+        <span style="flex:1">${ev.label}</span>
+        <span style="font-size:9px;background:${c.border};color:#fff;padding:1px 5px;border-radius:3px">${ev.area}</span>
+      </label>`;
+    }).join('');
+  }
+
+  overlay.innerHTML=`<div class="modal" style="width:520px">
+    <button class="modal-close" onclick="this.closest('.overlay').remove()">×</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div class="modal-title" style="margin:0">Exportar para Calendário</div>
+      <span style="font-size:20px">📅</span>
+    </div>
+    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">O arquivo <strong>.ICS</strong> abre diretamente no <strong>Google Calendar</strong>, <strong>Outlook</strong> e <strong>Apple Calendar</strong>. Selecione as áreas e eventos:</p>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-light)">
+      <button onclick="icsSelectAllAreas()" style="padding:3px 10px;border-radius:12px;border:1.5px solid var(--border-main);background:var(--bg-card);color:var(--text-secondary);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Todas áreas</button>
+      ${areaButtons}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button onclick="document.querySelectorAll('#icsItems input').forEach(c=>c.checked=true)" style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--border-main);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-family:inherit">✓ Todos</button>
+      <button onclick="document.querySelectorAll('#icsItems input').forEach(c=>c.checked=false)" style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--border-main);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-family:inherit">✕ Nenhum</button>
+      <span style="font-size:10px;color:var(--text-tertiary);margin-left:auto" id="icsCount">${allEvs.length} eventos</span>
+    </div>
+    <div style="max-height:320px;overflow-y:auto;border:1px solid var(--border-light);border-radius:8px;padding:4px" id="icsItems">${buildItems(allEvs)}</div>
+    <button class="btn-primary" style="margin-top:12px" onclick="doExportICS()">📅 Exportar .ICS</button>
+    <button class="btn-secondary" onclick="this.closest('.overlay').remove()">Cancelar</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  
+  // Store reference for area filtering
+  window._icsAllEvs=allEvs;
+  window._icsBuildItems=buildItems;
+  window._icsExcludedAreas=new Set();
+}
+
+function toggleICSArea(btn,area){
+  const exc=window._icsExcludedAreas;
+  if(exc.has(area)){exc.delete(area);btn.style.opacity='1';}
+  else{exc.add(area);btn.style.opacity='0.3';}
+  const filtered=window._icsAllEvs.filter(e=>!exc.has(e.area));
+  document.getElementById('icsItems').innerHTML=window._icsBuildItems(filtered);
+  document.getElementById('icsCount').textContent=`${filtered.length} eventos`;
+}
+
+function icsSelectAllAreas(){
+  window._icsExcludedAreas.clear();
+  document.querySelectorAll('.ics-area-btn').forEach(b=>b.style.opacity='1');
+  document.getElementById('icsItems').innerHTML=window._icsBuildItems(window._icsAllEvs);
+  document.getElementById('icsCount').textContent=`${window._icsAllEvs.length} eventos`;
+}
+
+function doExportICS(){
+  const checks=document.querySelectorAll('#icsItems input[type=checkbox]:checked');
+  const ids=new Set([...checks].map(c=>parseInt(c.value)));
+  const sel=EVENTS.filter(e=>ids.has(e.id)).sort((a,b)=>a.month-b.month||a.day-b.day);
+  if(!sel.length){alert('Selecione ao menos 1 evento.');return;}
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//AquaCapital//AquaCalendar//PT\r\nCALSCALE:GREGORIAN\r\nX-WR-CALNAME:Aqua Calendar 2026\r\n';
+  sel.forEach(ev=>{
+    const dt=`2026${String(ev.month).padStart(2,'0')}${String(ev.day).padStart(2,'0')}`;
+    const uid=`aqua-${ev.id}@aquacapital.com`;
+    const desc=(ev.desc||'').replace(/\n/g,'\\n');
+    ics+=`BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:${dt}\r\nDTEND;VALUE=DATE:${dt}\r\nSUMMARY:${ev.label}\r\nDESCRIPTION:Área: ${ev.area}${ev.recurrence?' | '+BG[ev.recurrence]:''}${desc?' | '+desc:''}\r\nCATEGORIES:${ev.area}\r\nUID:${uid}\r\nEND:VEVENT\r\n`;
+  });
+  ics+='END:VCALENDAR\r\n';
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='aqua-calendario-2026.ics';a.click();
+  document.getElementById('icsOverlay').remove();
+}
+
+// FILTERS
+function getFiltered(){return EVENTS.filter(e=>(S.activeAreas.size===0||S.activeAreas.has(e.area))&&matchesSearch(e));}
+
+// DUPLICATE
+function duplicateEvent(){const ev=EVENTS.find(e=>e.id===cId);if(!ev)return;const nev={...ev,id:nextId++,label:ev.label+' (cópia)'};EVENTS.push(nev);saveData();closeAll();render();}
+
+// UPCOMING CHECK (next 7 days)
+function isUpcoming(ev){const evDate=new Date(2026,ev.month-1,ev.day);const diff=(evDate-today)/(1000*60*60*24);return diff>0&&diff<=7;}
+
+function buildFilters(){const areas=Object.keys(AC),el=document.getElementById('filterGroup'),all=S.activeAreas.size===0,d=dk();
+  const as=all?(d?'border-color:#f1f5f9;background:#f1f5f9;color:#0f172a;font-weight:700':'border-color:#0f172a;background:#0f172a;color:#fff;font-weight:700'):'';
+  let h=`<button class="filter-btn${all?' active':''}" style="${as}" onclick="clearFilters()">Todas</button>`;
+  h+=areas.map(a=>{const c=gC(a),act=S.activeAreas.has(a),s=act?`border-color:${c.border};background:${c.bg};color:${c.text};font-weight:700`:'';return`<button class="filter-btn${act?' active':''}" style="${s}" onclick="toggleArea('${a}')">${a}</button>`;}).join('');
+  el.innerHTML=h;}
+function buildLegend(){const el=document.getElementById('legend');const items=Object.entries(AC).map(([a,c])=>`<div class="legend-item"><div class="legend-dot" style="background:${c.border}"></div><span class="legend-text">${a}</span></div>`).join('');const rec=Object.entries(BG).map(([,v])=>`<span class="recur-badge">${v}</span>`).join('');el.innerHTML=`<span class="legend-label">Áreas:</span>${items}<div class="legend-recur">${rec}</div>`;}
+
+// VIEW
+function setView(v){S.view=v;if(v==='quarter'||v==='month')S.activeQ=Math.floor(S.viewMonth/3);render();}
+function setQ(q){S.activeQ=q;if(S.view==='month')S.viewMonth=q*3;render();}
+function toggleArea(a){if(S.activeAreas.has(a))S.activeAreas.delete(a);else S.activeAreas.add(a);buildFilters();render();}
+function clearFilters(){S.activeAreas.clear();buildFilters();render();}
+function navMonth(d){S.viewMonth+=d;if(S.viewMonth>11){S.viewMonth=0;S.viewYear++;}if(S.viewMonth<0){S.viewMonth=11;S.viewYear--;}S.activeQ=Math.floor(S.viewMonth/3);render();}
+function jumpToday(){S.viewMonth=today.getMonth();S.viewYear=today.getFullYear();S.activeQ=Math.floor(today.getMonth()/3);render();}
+
+// RENDER
+function render(){const{view:v,activeQ:aq}=S;const f=getFiltered();
+  // Count upcoming
+  const upEvs=f.filter(isUpcoming).sort((a,b)=>a.month-b.month||a.day-b.day);
+  let upBadge='';
+  if(upEvs.length>0){
+    const tipItems=upEvs.map(ev=>{const c=gC(ev.area);return`<div class="upcoming-tip-item"><span class="upcoming-tip-date">${ev.day}/${MS[ev.month-1]}</span><span class="upcoming-tip-label">${ev.label}</span><span class="upcoming-tip-area" style="background:${c.border}">${ev.area}</span></div>`;}).join('');
+    upBadge=` · <span class="upcoming-wrap"><span class="upcoming-badge" style="display:inline-block;position:relative;padding-right:12px">${upEvs.length} próximo${upEvs.length!==1?'s':''}</span><div class="upcoming-tip"><div class="upcoming-tip-title">Próximos 7 dias</div>${tipItems}</div></span>`;
+  }
+  document.getElementById('subCount').innerHTML=`${f.length} entrega${f.length!==1?'s':''} · 2026${upBadge}`;
+  ['agenda','month','quarter','year'].forEach(x=>document.getElementById(`vbtn-${x}`).classList.toggle('active',v===x));
+  // Nav row — show for quarter and month views
+  const showNav=v==='quarter'||v==='month';
+  document.getElementById('navRow').style.display=showNav?'flex':'none';
+  if(showNav)[0,1,2,3].forEach(i=>document.getElementById(`qtab-${i}`).classList.toggle('active',i===aq));
+  // Month-specific nav elements
+  const isMonth=v==='month';
+  document.getElementById('navSep').style.display=isMonth?'block':'none';
+  document.getElementById('mnPrev').style.display=isMonth?'flex':'none';
+  document.getElementById('mnNext').style.display=isMonth?'flex':'none';
+  document.getElementById('todayJump').style.display=isMonth?'inline-block':'none';
+  const mnt=document.getElementById('monthNavTitle');
+  mnt.style.display=isMonth?'block':'none';
+  if(isMonth)mnt.textContent=`${MF[S.viewMonth]} ${S.viewYear}`;
+  const g=document.getElementById('calGrid');
+  if(v==='agenda'){
+    g.className='cal-grid month';
+    g.innerHTML=renderAgenda(f);
+    return;
+  }
+  g.className=`cal-grid ${v}`;
+  let ms;if(v==='year')ms=[...Array(12).keys()];else if(v==='quarter')ms=[aq*3,aq*3+1,aq*3+2];else ms=[S.viewMonth];
+  if(v==='month'){
+    g.innerHTML=`<div class="month-view-layout">${renderMiniCal(S.viewMonth,S.viewYear)}${ms.map(mi=>renderMC(mi,f,v)).join('')}</div>`;
+  } else {
+    g.innerHTML=ms.map(mi=>renderMC(mi,f,v)).join('');
+  }
+}
+
+function renderMC(mi,f,v){
+  const evs=f.filter(e=>e.month===mi+1).sort((a,b)=>a.day-b.day);
+  const cur=mi===today.getMonth()&&S.viewYear===today.getFullYear();
+  const ql=QS[Math.floor(mi/3)];
+  if(v==='month')return renderMF(mi,f,cur);
+  const col=v==='year',isC=S.collapsed.has(mi);
+  const ci=col?`<span class="collapse-icon${isC?' collapsed':''}" id="ci-${mi}">▼</span>`:'';
+  const hdr=`<div class="month-header${col?' collapsible':''}" ${col?`onclick="toggleCollapse(${mi})"`:''}><span class="month-name small">${ci}${v==='year'?MS[mi]:MF[mi]}</span><div class="month-header-right">${evs.length?`<span class="event-count">${evs.length}</span>`:''}<span class="q-badge">${ql}</span></div></div>`;
+  let body;
+  if(evs.length===0){
+    body=`<div class="events-list"><div class="empty-month">—</div></div>`;
+  } else if(v==='quarter'){
+    // Group by week
+    const weeks={};
+    evs.forEach(ev=>{
+      const d=new Date(2026,mi,ev.day);
+      const startOfYear=new Date(2026,0,1);
+      const wn=Math.ceil(((d-startOfYear)/86400000+startOfYear.getDay()+1)/7);
+      if(!weeks[wn])weeks[wn]=[];
+      weeks[wn].push(ev);
+    });
+    body=`<div class="events-list">${Object.entries(weeks).map(([wn,wevs])=>{
+      const firstDay=wevs[0].day,lastDay=wevs[wevs.length-1].day;
+      const range=firstDay===lastDay?`Dia ${firstDay}`:`${firstDay}–${lastDay}`;
+      return`<div class="week-group"><div class="week-label">Sem ${wn} · ${range}</div>${wevs.map(renderER).join('')}</div>`;
+    }).join('')}</div>`;
+  } else {
+    body=`<div class="events-list">${evs.map(renderER).join('')}</div>`;
+  }
+  const bw=`<div class="month-body${isC?' collapsed':''}" id="mb-${mi}" style="max-height:${isC?0:2000}px">${body}</div>`;
+  return`<div class="month-card${cur?' is-current':''}" ondragover="onCDO(event)" ondragleave="onCDL(event)" ondrop="onCD(event,${mi+1})">${hdr}${bw}</div>`;
+}
+
+// AGENDA VIEW
+const WEEKDAYS_FULL=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+function renderAgenda(f){
+  const sorted=f.slice().sort((a,b)=>a.month-b.month||a.day-b.day);
+  let html='<div class="agenda-list">';
+  let curMonth=-1;
+  sorted.forEach(ev=>{
+    if(ev.month!==curMonth){
+      const mEvs=sorted.filter(e=>e.month===ev.month);
+      html+=`<div class="agenda-month-header">${MF[ev.month-1]}<span class="agenda-month-count">${mEvs.length}</span></div>`;
+      curMonth=ev.month;
+    }
+    const c=gC(ev.area);
+    const evDate=new Date(2026,ev.month-1,ev.day);
+    const diff=Math.ceil((evDate-today)/(1000*60*60*24));
+    let countdown='';
+    if(diff===0)countdown='Hoje';
+    else if(diff===1)countdown='Amanhã';
+    else if(diff>1&&diff<=30)countdown=`em ${diff}d`;
+    else if(diff<0)countdown=`${Math.abs(diff)}d atrás`;
+    const isPast=diff<0;
+    const wd=WEEKDAYS_FULL[evDate.getDay()];
+    html+=`<div class="agenda-item${isPast?' agenda-past':''}" onclick="showDetail(${ev.id})">
+      <div class="agenda-date-col"><div class="agenda-day">${ev.day}</div><div class="agenda-weekday">${wd.slice(0,3)}</div></div>
+      <div class="agenda-bar" style="background:${c.border}"></div>
+      <div class="agenda-content">
+        <div class="agenda-title">${ev.label}</div>
+        <div class="agenda-meta">
+          <span class="agenda-area-tag" style="background:${c.border}">${ev.area}</span>
+          ${ev.recurrence?`<span class="agenda-recur-tag">${BG[ev.recurrence]}</span>`:''}
+          ${countdown?`<span class="agenda-countdown">${countdown}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  return html;
+}
+
+function renderER(ev){const c=gC(ev.area);const hl=S.searchTerm&&S.searchTerm.length>1&&matchesSearch(ev)?' search-highlight':'';const up=isUpcoming(ev)?' is-upcoming':'';
+  return`<div class="event-row${hl}${up}" style="background:${c.bg};border-left:3px solid ${c.border}" data-eid="${ev.id}" draggable="true" ondragstart="onDS(event,${ev.id})" ondragend="onDE()" onclick="showDetail(${ev.id})" onmouseenter="showTT(event,${ev.id})" onmouseleave="hideTT()"><span class="drag-handle">⠿</span><span class="event-day" style="color:${c.text}">${ev.day}</span><div class="event-body"><div class="event-label">${ev.label}</div><div class="event-tags"><span class="tag-area" style="background:${c.border}">${ev.area}</span>${ev.recurrence?`<span class="tag-recur">${BG[ev.recurrence]||''}</span>`:''}</div></div></div>`;}
+
+function renderMF(mi,f,cur){
+  const yr=S.viewYear,evs=f.filter(e=>e.month===mi+1),first=new Date(yr,mi,1).getDay(),total=new Date(yr,mi+1,0).getDate(),prevT=new Date(yr,mi,0).getDate(),ql=QS[Math.floor(mi/3)];
+  const hdr=`<div class="month-header"><span class="month-name large">${MF[mi]} ${yr}</span><div class="month-header-right">${evs.length?`<span class="event-count">${evs.length}</span>`:''}<span class="q-badge">${ql}</span></div></div>`;
+  const wr=`<div class="cal-weekdays">${WD.map(d=>`<div class="cal-weekday">${d}</div>`).join('')}</div>`;
+  let cells=[];for(let i=first-1;i>=0;i--)cells.push({day:prevT-i,cur:false});for(let i=1;i<=total;i++)cells.push({day:i,cur:true});while(cells.length%7)cells.push({day:cells.length-total-first+1,cur:false});
+  const dg=cells.map(({day,cur:cu})=>{const dow=new Date(yr,mi,cu?day:1).getDay();const iT=cu&&day===today.getDate()&&mi===today.getMonth()&&yr===today.getFullYear();const isW=dow===0||dow===6;const de=cu?evs.filter(e=>e.day===day):[];const sh=de.slice(0,3),rest=de.length-sh.length;
+    const cls=['cal-cell',!cu&&'other-month',iT&&'today-cell',isW&&'weekend-cell'].filter(Boolean).join(' ');
+    const pills=sh.map(ev=>{const c=gC(ev.area);return`<div class="cell-event" style="background:${c.bg};color:${c.text};border-left-color:${c.border}" onclick="showDetail(${ev.id})" onmouseenter="showTT(event,${ev.id})" onmouseleave="hideTT()" title="">${ev.label}</div>`;}).join('');
+    const moreBtn=rest>0?`<div class="cell-more" onclick="openDayPopover(event,${mi+1},${day})">+${rest} mais</div>`:'';
+    return`<div class="${cls}"><div class="cell-day-num">${day}</div>${pills}${moreBtn}</div>`;}).join('');
+  return`<div class="month-card${cur?' is-current':''}">${hdr}${wr}<div class="cal-days">${dg}</div></div>`;
+}
+
+// MINI CALENDAR
+function renderMiniCal(mi,yr){
+  const first=new Date(yr,mi,1).getDay();const total=new Date(yr,mi+1,0).getDate();const prevT=new Date(yr,mi,0).getDate();
+  let cells=[];for(let i=first-1;i>=0;i--)cells.push({day:prevT-i,cur:false});
+  for(let i=1;i<=total;i++)cells.push({day:i,cur:true});
+  while(cells.length%7)cells.push({day:cells.length-total-first+1,cur:false});
+  const evDays=new Set(EVENTS.filter(e=>e.month===mi+1).map(e=>e.day));
+  const isT=(d)=>d===today.getDate()&&mi===today.getMonth()&&yr===today.getFullYear();
+  const grid=cells.map(({day,cur})=>{
+    const cls=['mini-cal-day',!cur&&'other',cur&&isT(day)&&'today',cur&&evDays.has(day)&&!isT(day)&&'has-events'].filter(Boolean).join(' ');
+    return`<div class="${cls}">${day}</div>`;
+  }).join('');
+  const months=MF.map((m,i)=>{
+    const cls=['mini-cal-month',i===mi&&'active',i===today.getMonth()&&yr===today.getFullYear()&&'current-month'].filter(Boolean).join(' ');
+    return`<div class="${cls}" onclick="S.viewMonth=${i};S.activeQ=Math.floor(${i}/3);render()">${MS[i]}</div>`;
+  }).join('');
+  return`<div class="mini-cal">
+    <div class="mini-cal-nav">
+      <button class="mini-cal-nav-btn" onclick="navMonth(-1)">‹</button>
+      <div class="mini-cal-title">${MF[mi]} ${yr}</div>
+      <button class="mini-cal-nav-btn" onclick="navMonth(1)">›</button>
+    </div>
+    <div class="mini-cal-grid">${WD.map(d=>`<div class="mini-cal-wd">${d}</div>`).join('')}${grid}</div>
+    <div class="mini-cal-months">${months}</div>
+  </div>`;
+}
+
+// MODALS
+let cId=null;
+function showDetail(id){hideTT();const ev=EVENTS.find(e=>e.id===id);if(!ev)return;cId=id;const c=gC(ev.area);
+  document.getElementById('dAreaBadge').style.cssText=`background:${c.bg};color:${c.text};border:1.5px solid ${c.border}`;
+  document.getElementById('dAreaBadge').innerHTML=`<div style="width:8px;height:8px;border-radius:50%;background:${c.border}"></div>${ev.area}`;
+  document.getElementById('dTitle').textContent=ev.label;
+  document.getElementById('dDate').innerHTML=`📅 ${ev.day} de ${MF[ev.month-1]}${ev.recurrence?` &nbsp;·&nbsp; ${BG[ev.recurrence]}`:''}`;
+  document.getElementById('dDesc').textContent=ev.desc||'Sem descrição adicional.';
+  document.getElementById('detailOverlay').classList.add('open');}
+function openEdit(){const ev=EVENTS.find(e=>e.id===cId);if(!ev)return;document.getElementById('editTitle').value=ev.label;document.getElementById('editMonth').value=ev.month;document.getElementById('editDay').value=ev.day;document.getElementById('editArea').value=ev.area;document.getElementById('editRecur').value=ev.recurrence||'';document.getElementById('editDesc').value=ev.desc||'';document.getElementById('detailOverlay').classList.remove('open');document.getElementById('editOverlay').classList.add('open');}
+function saveEdit(){const idx=EVENTS.findIndex(e=>e.id===cId);if(idx===-1)return;const t=document.getElementById('editTitle').value.trim(),m=parseInt(document.getElementById('editMonth').value),d=parseInt(document.getElementById('editDay').value),a=document.getElementById('editArea').value,r=document.getElementById('editRecur').value,desc=document.getElementById('editDesc').value.trim();if(!t||!d){alert('Preencha título e dia.');return;}EVENTS[idx]={...EVENTS[idx],label:t,month:m,day:d,area:a,recurrence:r||undefined,desc};saveData();closeAll();render();}
+function deleteEvent(){if(!confirm('Deletar este evento?'))return;EVENTS=EVENTS.filter(e=>e.id!==cId);saveData();closeAll();render();}
+function openAdd(){const d=new Date().toISOString().split('T')[0];document.getElementById('evTitle').value='';document.getElementById('evStart').value=d;document.getElementById('evEnd').value=d;document.getElementById('evDesc').value='';document.getElementById('evRecur').value='';document.getElementById('addOverlay').classList.add('open');}
+function addEvent(){const t=document.getElementById('evTitle').value.trim(),s=document.getElementById('evStart').value,a=document.getElementById('evArea').value,r=document.getElementById('evRecur').value,desc=document.getElementById('evDesc').value.trim();if(!t||!s){alert('Preencha título e data.');return;}const[,m,d]=s.split('-').map(Number);EVENTS.push({id:nextId++,month:m,day:d,area:a,label:t,recurrence:r||undefined,desc});saveData();closeAll();render();}
+function closeAll(){['detailOverlay','addOverlay','editOverlay'].forEach(id=>document.getElementById(id).classList.remove('open'));}
+function closeOnBg(e,id){if(e.target.id===id)closeAll();}
+
+// DAY POPOVER
+let dayPopEl=null;
+function openDayPopover(e,month,day){
+  e.stopPropagation();
+  closeDayPopover();
+  const evs=getFiltered().filter(ev=>ev.month===month&&ev.day===day);
+  if(!evs.length)return;
+  dayPopEl=document.createElement('div');
+  dayPopEl.className='day-popover';
+  dayPopEl.innerHTML=`<div class="day-popover-header"><div class="day-popover-title">${day} de ${MF[month-1]} · ${evs.length} evento${evs.length!==1?'s':''}</div><button class="day-popover-close" onclick="closeDayPopover()">×</button></div>${evs.map(ev=>{const c=gC(ev.area);return`<div class="event-row" style="background:${c.bg};border-left:3px solid ${c.border};cursor:pointer" onclick="closeDayPopover();showDetail(${ev.id})"><span class="event-day" style="color:${c.text}">${ev.day}</span><div class="event-body"><div class="event-label">${ev.label}</div><div class="event-tags"><span class="tag-area" style="background:${c.border}">${ev.area}</span>${ev.recurrence?`<span class="tag-recur">${BG[ev.recurrence]}</span>`:''}</div></div></div>`;}).join('')}`;
+  document.body.appendChild(dayPopEl);
+  const rect=e.target.getBoundingClientRect();
+  let top=rect.bottom+6,left=rect.left;
+  if(left+280>window.innerWidth)left=window.innerWidth-290;
+  if(top+300>window.innerHeight)top=rect.top-310;
+  if(left<8)left=8;if(top<8)top=8;
+  dayPopEl.style.left=left+'px';dayPopEl.style.top=top+'px';
+  setTimeout(()=>document.addEventListener('click',closeDayPopoverOutside),0);
+}
+function closeDayPopover(){if(dayPopEl){dayPopEl.remove();dayPopEl=null;}document.removeEventListener('click',closeDayPopoverOutside);}
+function closeDayPopoverOutside(e){if(dayPopEl&&!dayPopEl.contains(e.target))closeDayPopover();}
+
+init();
+</script>
+</body>
+</html>
