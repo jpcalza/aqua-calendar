@@ -819,8 +819,16 @@
       "area": "Operations",
       "label": "FIP 7 AND 8 Q3 REPORT",
       "desc": ""
+    },
+    {
+      "id": 266,
+      "month": 12,
+      "day": 12,
+      "area": "Operations",
+      "label": "FIP 7 XP Q UPDATE CALL",
+      "desc": ""
     }
   ],
-  "nextId": 266,
-  "updatedAt": "2026-03-16T21:13:58.097Z"
+  "nextId": 267,
+  "updatedAt": "2026-03-16T21:14:31.095Z"
 }
