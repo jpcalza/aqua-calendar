@@ -118,13 +118,6 @@
       "desc": ""
     },
     {
-      "id": 17,
-      "month": 7,
-      "day": 31,
-      "area": "Tails",
-      "label": "KPIs Semestrais – Portcos"
-    },
-    {
       "id": 18,
       "month": 8,
       "day": 15,
@@ -757,5 +750,5 @@
     }
   ],
   "nextId": 255,
-  "updatedAt": "2026-03-16T21:05:59.563Z"
+  "updatedAt": "2026-03-16T21:06:01.657Z"
 }
