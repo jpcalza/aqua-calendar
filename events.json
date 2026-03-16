@@ -160,8 +160,9 @@
       "id": 20,
       "month": 9,
       "day": 15,
-      "area": "Ops & CS",
-      "label": "AGM Prep – Draft Materials"
+      "area": "Operations",
+      "label": "AGM Prep – Draft Materials",
+      "desc": ""
     },
     {
       "id": 21,
@@ -654,5 +655,5 @@
     }
   ],
   "nextId": 201,
-  "updatedAt": "2026-03-16T18:53:27.140Z"
+  "updatedAt": "2026-03-16T18:53:35.607Z"
 }
