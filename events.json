@@ -738,8 +738,16 @@
       "area": "Controllership",
       "label": "Q1 SUPPLEMENTARY REPORTING PACKAGE DELVERY",
       "desc": "(GALAXY, AGF LATAM, SPV COINVESTROS 1 AND 2 FINANCIALS AND CAP TABLES AND LP ADDITIONAL INFORMATION)"
+    },
+    {
+      "id": 231,
+      "month": 5,
+      "day": 16,
+      "area": "Controllership",
+      "label": "Q1 SUPPLEMENTARY REPORTING PACKAGE DELVERY (cópia)",
+      "desc": "(GALAXY, AGF LATAM, SPV COINVESTROS 1 AND 2 FINANCIALS AND CAP TABLES AND LP ADDITIONAL INFORMATION)"
     }
   ],
-  "nextId": 231,
-  "updatedAt": "2026-03-16T21:00:09.340Z"
+  "nextId": 232,
+  "updatedAt": "2026-03-16T21:00:14.110Z"
 }
