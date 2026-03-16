@@ -823,12 +823,12 @@
     {
       "id": 267,
       "month": 6,
-      "day": 24,
+      "day": 25,
       "area": "Aqua",
-      "label": "AGM (cópia)",
+      "label": "AGM",
       "desc": ""
     }
   ],
   "nextId": 268,
-  "updatedAt": "2026-03-16T21:20:53.326Z"
+  "updatedAt": "2026-03-16T21:21:04.158Z"
 }
