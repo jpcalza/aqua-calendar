@@ -731,8 +731,16 @@
       "area": "Aqua",
       "label": "AGM (21/21)",
       "desc": ""
+    },
+    {
+      "id": 255,
+      "month": 8,
+      "day": 15,
+      "area": "Aqua",
+      "label": "Q2 REPORTING PACKAGE DELVERY",
+      "desc": "(OFFSHORE FINANCIALS, CAP TABLES, Q REPORT)"
     }
   ],
-  "nextId": 255,
-  "updatedAt": "2026-03-16T21:06:06.362Z"
+  "nextId": 256,
+  "updatedAt": "2026-03-16T21:06:37.424Z"
 }
