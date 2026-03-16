@@ -220,14 +220,6 @@
       "recurrence": "quarterly"
     },
     {
-      "id": 31,
-      "month": 12,
-      "day": 31,
-      "area": "Tails",
-      "label": "Portco Board Meetings – Q4",
-      "recurrence": "quarterly"
-    },
-    {
       "id": 32,
       "month": 3,
       "day": 1,
@@ -742,5 +734,5 @@
     }
   ],
   "nextId": 255,
-  "updatedAt": "2026-03-16T21:06:03.899Z"
+  "updatedAt": "2026-03-16T21:06:06.362Z"
 }
