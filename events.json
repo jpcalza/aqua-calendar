@@ -720,7 +720,7 @@
       "id": 233,
       "month": 6,
       "day": 10,
-      "area": "Controllership",
+      "area": "Operations",
       "label": "FIP 7 XP Q UPDATE CALL",
       "desc": ""
     },
@@ -742,5 +742,5 @@
     }
   ],
   "nextId": 256,
-  "updatedAt": "2026-03-16T21:07:56.845Z"
+  "updatedAt": "2026-03-16T21:08:00.803Z"
 }
