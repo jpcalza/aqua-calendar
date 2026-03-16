@@ -168,9 +168,10 @@
       "id": 21,
       "month": 9,
       "day": 30,
-      "area": "Ops & CS",
+      "area": "Operations",
       "label": "Allocation Committee – Q3",
-      "recurrence": "quarterly"
+      "recurrence": "quarterly",
+      "desc": ""
     },
     {
       "id": 22,
@@ -655,5 +656,5 @@
     }
   ],
   "nextId": 201,
-  "updatedAt": "2026-03-16T18:53:35.607Z"
+  "updatedAt": "2026-03-16T18:53:41.115Z"
 }
