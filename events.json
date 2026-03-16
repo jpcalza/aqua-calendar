@@ -768,7 +768,7 @@
       "month": 6,
       "day": 10,
       "area": "Aqua",
-      "label": "AGM (1/21)",
+      "label": "AGM",
       "desc": ""
     },
     {
@@ -933,5 +933,5 @@
     }
   ],
   "nextId": 255,
-  "updatedAt": "2026-03-16T21:04:15.250Z"
+  "updatedAt": "2026-03-16T21:04:30.110Z"
 }
