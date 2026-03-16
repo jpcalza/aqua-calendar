@@ -664,8 +664,8 @@
       "month": 3,
       "day": 31,
       "area": "Controllership",
-      "label": "K1 DRAFT DELIVERY (F1, F2, F3)",
-      "desc": ""
+      "label": "K1 DRAFT DELIVERY",
+      "desc": "(F1, F2, F3)"
     },
     {
       "id": 207,
@@ -677,5 +677,5 @@
     }
   ],
   "nextId": 208,
-  "updatedAt": "2026-03-16T20:54:49.473Z"
+  "updatedAt": "2026-03-16T20:55:02.328Z"
 }
