@@ -461,7 +461,7 @@ select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http
       <input class="form-input" type="date" id="evEnd">
     </div>
   </div>
-  <div class="form-group"><label class="form-label">Área</label><select class="form-input" id="evArea"><option value="Ops & CS">Ops & CS</option><option value="Legal">Legal</option><option value="Regulatory">Regulatory</option><option value="Tails">Tails</option><option value="Controllership">Controllership</option><option value="Compliance">Compliance</option><option value="ESG">ESG</option></select></div>
+  <div class="form-group"><label class="form-label">Área</label><select class="form-input" id="evArea"><option value="Operations">Operations</option><option value="Legal">Legal</option><option value="Regulatory">Regulatory</option><option value="Tails">Tails</option><option value="Controllership">Controllership</option><option value="Compliance">Compliance</option><option value="ESG">ESG</option><option value="Aqua">Aqua</option><option value="People">People</option></select></div>
   <div class="form-group"><label class="form-label">Recorrência</label><select class="form-input" id="evRecur"><option value="">Nenhuma</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="semi-annual">Semestral</option><option value="annual">Anual</option></select></div>
   <div class="form-group"><label class="form-label">Descrição (opcional)</label><textarea class="form-input" id="evDesc" rows="3" placeholder="Detalhes, responsáveis, links..."></textarea></div>
   <button class="btn-primary" onclick="addEvent()">Adicionar Evento</button><button class="btn-secondary" onclick="closeAll()">Cancelar</button>
@@ -472,7 +472,7 @@ select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http
   <div class="modal-title" style="margin-bottom:20px">Editar Evento</div>
   <div class="form-group"><label class="form-label">Título</label><input class="form-input" type="text" id="editTitle"></div>
   <div class="form-row"><div class="form-group"><label class="form-label">Mês</label><select class="form-input" id="editMonth"><option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option><option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select></div><div class="form-group"><label class="form-label">Dia</label><input class="form-input" type="number" id="editDay" min="1" max="31"></div></div>
-  <div class="form-group"><label class="form-label">Área</label><select class="form-input" id="editArea"><option value="Ops & CS">Ops & CS</option><option value="Legal">Legal</option><option value="Regulatory">Regulatory</option><option value="Tails">Tails</option><option value="Controllership">Controllership</option><option value="Compliance">Compliance</option><option value="ESG">ESG</option></select></div>
+  <div class="form-group"><label class="form-label">Área</label><select class="form-input" id="editArea"><option value="Operations">Operations</option><option value="Legal">Legal</option><option value="Regulatory">Regulatory</option><option value="Tails">Tails</option><option value="Controllership">Controllership</option><option value="Compliance">Compliance</option><option value="ESG">ESG</option><option value="Aqua">Aqua</option><option value="People">People</option></select></div>
   <div class="form-group"><label class="form-label">Recorrência</label><select class="form-input" id="editRecur"><option value="">Nenhuma</option><option value="monthly">Mensal</option><option value="quarterly">Trimestral</option><option value="semi-annual">Semestral</option><option value="annual">Anual</option></select></div>
   <div class="form-group"><label class="form-label">Descrição (opcional)</label><textarea class="form-input" id="editDesc" rows="3"></textarea></div>
   <button class="btn-primary" onclick="saveEdit()">Salvar alterações</button><button class="btn-secondary" onclick="closeAll()">Cancelar</button>
@@ -480,22 +480,26 @@ select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http
 
 <script>
 const AC={
-  "Ops & CS":{bg:"#E8F4FD",border:"#2B7BB9",text:"#1a5a8a"},
+  "Operations":{bg:"#E8F4FD",border:"#2B7BB9",text:"#1a5a8a"},
   "Legal":{bg:"#FDF3E8",border:"#D4872B",text:"#9a5c0a"},
-  "Regulatory":{bg:"#EDF7ED",border:"#2B9E2B",text:"#1a6e1a"},
+  "Regulatory":{bg:"#E8F4F8",border:"#0891b2",text:"#155e75"},
   "Tails":{bg:"#F5EDF7",border:"#8B2BA8",text:"#5a1a72"},
   "Controllership":{bg:"#FFF4F4",border:"#C0392B",text:"#7b1a1a"},
   "Compliance":{bg:"#FFFBEA",border:"#C9A800",text:"#7a6000"},
-  "ESG":{bg:"#EDFAF3",border:"#16a34a",text:"#14532d"}
+  "ESG":{bg:"#EDFAF3",border:"#16a34a",text:"#14532d"},
+  "Aqua":{bg:"#F1F5F9",border:"#64748b",text:"#334155"},
+  "People":{bg:"#FDF2F8",border:"#db2777",text:"#9d174d"}
 };
 const AD={
-  "Ops & CS":{bg:"rgba(43,123,185,0.15)",border:"#3b8fd4",text:"#7cc4f0"},
+  "Operations":{bg:"rgba(43,123,185,0.15)",border:"#3b8fd4",text:"#7cc4f0"},
   "Legal":{bg:"rgba(212,135,43,0.15)",border:"#e09a3e",text:"#f0c47c"},
-  "Regulatory":{bg:"rgba(43,158,43,0.15)",border:"#3ebe3e",text:"#82e082"},
+  "Regulatory":{bg:"rgba(8,145,178,0.15)",border:"#22d3ee",text:"#67e8f9"},
   "Tails":{bg:"rgba(139,43,168,0.15)",border:"#a848c8",text:"#d08ce8"},
   "Controllership":{bg:"rgba(192,57,43,0.15)",border:"#e04b3d",text:"#f08c82"},
   "Compliance":{bg:"rgba(201,168,0,0.15)",border:"#e0c020",text:"#f0d860"},
-  "ESG":{bg:"rgba(22,163,74,0.15)",border:"#2dd464",text:"#86efac"}
+  "ESG":{bg:"rgba(22,163,74,0.15)",border:"#2dd464",text:"#86efac"},
+  "Aqua":{bg:"rgba(100,116,139,0.15)",border:"#94a3b8",text:"#cbd5e1"},
+  "People":{bg:"rgba(219,39,119,0.15)",border:"#f472b6",text:"#fbcfe8"}
 };
 const dk=()=>window.matchMedia('(prefers-color-scheme:dark)').matches;
 const gC=a=>(dk()?AD:AC)[a]||{bg:'#f1f5f9',border:'#94a3b8',text:'#475569'};
@@ -507,33 +511,33 @@ const QS=["Q1","Q2","Q3","Q4"],WD=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 let EVENTS=[
 {id:1,month:1,day:31,area:"Regulatory",label:"ANBIMA – Informe Mensal",recurrence:"monthly"},
 {id:2,month:1,day:31,area:"Regulatory",label:"CVM – Lâminas de Fundos",recurrence:"monthly"},
-{id:3,month:2,day:15,area:"Ops & CS",label:"Q4 Reports (prior year)",recurrence:"quarterly"},
+{id:3,month:2,day:15,area:"Operations",label:"Q4 Reports (prior year)",recurrence:"quarterly"},
 {id:4,month:2,day:28,area:"Regulatory",label:"BACEN – Capitais Estrangeiros"},
 {id:5,month:3,day:15,area:"Legal",label:"Q4 Legal Report",recurrence:"quarterly"},
-{id:6,month:3,day:31,area:"Ops & CS",label:"Allocation Committee – Q1",recurrence:"quarterly"},
+{id:6,month:3,day:31,area:"Operations",label:"Allocation Committee – Q1",recurrence:"quarterly"},
 {id:7,month:3,day:31,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
-{id:8,month:4,day:15,area:"Ops & CS",label:"Q1 Reports",recurrence:"quarterly"},
+{id:8,month:4,day:15,area:"Operations",label:"Q1 Reports",recurrence:"quarterly"},
 {id:9,month:4,day:30,area:"Tails",label:"Portco Budget Review – H1",recurrence:"semi-annual"},
 {id:10,month:5,day:15,area:"Legal",label:"Q1 Legal Report",recurrence:"quarterly"},
 {id:11,month:5,day:31,area:"Regulatory",label:"ANBIMA – Informe Semestral",recurrence:"semi-annual"},
-{id:12,month:6,day:15,area:"Ops & CS",label:"LPAC Meeting – H1",recurrence:"semi-annual"},
-{id:13,month:6,day:30,area:"Ops & CS",label:"Allocation Committee – Q2",recurrence:"quarterly"},
+{id:12,month:6,day:15,area:"Operations",label:"LPAC Meeting – H1",recurrence:"semi-annual"},
+{id:13,month:6,day:30,area:"Operations",label:"Allocation Committee – Q2",recurrence:"quarterly"},
 {id:14,month:6,day:30,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
 {id:15,month:6,day:30,area:"Tails",label:"Portco Board Meetings – Q2",recurrence:"quarterly"},
-{id:16,month:7,day:15,area:"Ops & CS",label:"Q2 Reports",recurrence:"quarterly"},
+{id:16,month:7,day:15,area:"Operations",label:"Q2 Reports",recurrence:"quarterly"},
 {id:17,month:7,day:31,area:"Tails",label:"KPIs Semestrais – Portcos"},
 {id:18,month:8,day:15,area:"Legal",label:"Q2 Legal Report",recurrence:"quarterly"},
 {id:19,month:8,day:31,area:"Regulatory",label:"BACEN – Relatório Semestral",recurrence:"semi-annual"},
-{id:20,month:9,day:15,area:"Ops & CS",label:"AGM Prep – Draft Materials"},
-{id:21,month:9,day:30,area:"Ops & CS",label:"Allocation Committee – Q3",recurrence:"quarterly"},
+{id:20,month:9,day:15,area:"Operations",label:"AGM Prep – Draft Materials"},
+{id:21,month:9,day:30,area:"Operations",label:"Allocation Committee – Q3",recurrence:"quarterly"},
 {id:22,month:9,day:30,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
-{id:23,month:10,day:15,area:"Ops & CS",label:"Q3 Reports",recurrence:"quarterly"},
+{id:23,month:10,day:15,area:"Operations",label:"Q3 Reports",recurrence:"quarterly"},
 {id:24,month:10,day:31,area:"Tails",label:"Portco Budget Submission – FY+1",recurrence:"annual"},
 {id:25,month:11,day:15,area:"Legal",label:"Q3 Legal Report",recurrence:"quarterly"},
-{id:26,month:11,day:30,area:"Ops & CS",label:"AGM – Annual General Meeting",recurrence:"annual"},
-{id:27,month:12,day:15,area:"Ops & CS",label:"LPAC Meeting – H2",recurrence:"semi-annual"},
-{id:28,month:12,day:20,area:"Ops & CS",label:"Audit – Year-End Kickoff",recurrence:"annual"},
-{id:29,month:12,day:31,area:"Ops & CS",label:"Allocation Committee – Q4",recurrence:"quarterly"},
+{id:26,month:11,day:30,area:"Operations",label:"AGM – Annual General Meeting",recurrence:"annual"},
+{id:27,month:12,day:15,area:"Operations",label:"LPAC Meeting – H2",recurrence:"semi-annual"},
+{id:28,month:12,day:20,area:"Operations",label:"Audit – Year-End Kickoff",recurrence:"annual"},
+{id:29,month:12,day:31,area:"Operations",label:"Allocation Committee – Q4",recurrence:"quarterly"},
 {id:30,month:12,day:31,area:"Regulatory",label:"CVM – Informe Trimestral",recurrence:"quarterly"},
 {id:31,month:12,day:31,area:"Tails",label:"Portco Board Meetings – Q4",recurrence:"quarterly"},
 {id:32,month:3,day:1,area:"Legal",label:"D&O: Renovação Apólice Global",recurrence:"annual"},
@@ -585,7 +589,23 @@ let EVENTS=[
 {id:88,month:11,day:30,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
 {id:89,month:12,day:31,area:"ESG",label:"Q4 PortCo's targets review & ESG+I BP status review",recurrence:"quarterly",desc:"Consolidates: Q4 PortCo's targets review · Q4 ESG+I BP status review"},
 {id:90,month:12,day:31,area:"ESG",label:"Progress: positive impact projects",recurrence:"monthly"},
+{id:91,month:2,day:28,area:"People",label:"Performance Review Committee",recurrence:"annual"},
+{id:92,month:3,day:31,area:"People",label:"Feedbacks",recurrence:"semi-annual"},
+{id:93,month:3,day:31,area:"People",label:"Internship Program",recurrence:"semi-annual"},
+{id:94,month:4,day:30,area:"People",label:"Bonus Payout",recurrence:"annual"},
+{id:95,month:4,day:30,area:"People",label:"Induction",recurrence:"semi-annual"},
+{id:96,month:6,day:30,area:"People",label:"Onboarding Program",recurrence:"annual"},
+{id:97,month:6,day:30,area:"People",label:"PWR",recurrence:"semi-annual"},
+{id:98,month:7,day:31,area:"People",label:"Performance Review",recurrence:"annual"},
+{id:99,month:8,day:31,area:"People",label:"Committee",recurrence:"annual"},
+{id:100,month:8,day:31,area:"People",label:"Feedbacks",recurrence:"semi-annual"},
+{id:101,month:9,day:30,area:"People",label:"Internship Program",recurrence:"semi-annual"},
+{id:102,month:10,day:31,area:"People",label:"Aqua's Anniversary",recurrence:"annual"},
+{id:103,month:11,day:30,area:"People",label:"Induction",recurrence:"semi-annual"},
+{id:104,month:12,day:31,area:"People",label:"Offsite",recurrence:"annual"},
+{id:105,month:12,day:31,area:"People",label:"PWR",recurrence:"semi-annual"},
 ];
+
 let nextId=200;
 
 // ═══════════════════════════════════════════════════════════════
