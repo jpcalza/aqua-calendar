@@ -1,28 +1,4 @@
 {
-  "year": 2026,
-  "areas": {
-    "Ops & CS": {
-      "email": "jpc@aqua.capital"
-    },
-    "Legal": {
-      "email": "jpc@aqua.capital"
-    },
-    "Regulatory": {
-      "email": "jpc@aqua.capital"
-    },
-    "Tails": {
-      "email": "jpc@aqua.capital"
-    },
-    "Controllership": {
-      "email": "jpc@aqua.capital"
-    },
-    "Compliance": {
-      "email": "jpc@aqua.capital"
-    },
-    "ESG": {
-      "email": "jpc@aqua.capital"
-    }
-  },
   "events": [
     {
       "id": 1,
@@ -669,14 +645,8 @@
       "area": "ESG",
       "label": "Progress: positive impact projects",
       "recurrence": "monthly"
-    },
-    {
-      "id": 200,
-      "month": 3,
-      "day": 23,
-      "area": "Ops & CS",
-      "label": "allocation",
-      "desc": ""
     }
-  ]
+  ],
+  "nextId": 200,
+  "updatedAt": "2026-03-16T18:05:12.009Z"
 }
