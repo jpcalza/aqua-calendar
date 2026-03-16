@@ -658,8 +658,16 @@
       "area": "ESG",
       "label": "Progress: positive impact projects",
       "recurrence": "monthly"
+    },
+    {
+      "id": 206,
+      "month": 3,
+      "day": 31,
+      "area": "Controllership",
+      "label": "K1 DRAFT DELIVERY (F1, F2, F3)",
+      "desc": ""
     }
   ],
-  "nextId": 206,
-  "updatedAt": "2026-03-16T20:37:51.441Z"
+  "nextId": 207,
+  "updatedAt": "2026-03-16T20:54:06.386Z"
 }
