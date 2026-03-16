@@ -658,16 +658,8 @@
       "area": "ESG",
       "label": "Progress: positive impact projects",
       "recurrence": "monthly"
-    },
-    {
-      "id": 205,
-      "month": 3,
-      "day": 21,
-      "area": "Operations",
-      "label": "teste (5/5)",
-      "desc": ""
     }
   ],
   "nextId": 206,
-  "updatedAt": "2026-03-16T19:32:54.488Z"
+  "updatedAt": "2026-03-16T19:32:57.255Z"
 }
