@@ -763,8 +763,16 @@
       "area": "Operations",
       "label": "FIP 7 AND 8 Q2 REPORT",
       "desc": ""
+    },
+    {
+      "id": 259,
+      "month": 8,
+      "day": 25,
+      "area": "Operations",
+      "label": "FIP 7 AND 8 Q2 REPORT (cópia)",
+      "desc": ""
     }
   ],
-  "nextId": 259,
-  "updatedAt": "2026-03-16T21:10:03.969Z"
+  "nextId": 260,
+  "updatedAt": "2026-03-16T21:10:05.901Z"
 }
