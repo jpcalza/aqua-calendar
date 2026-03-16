@@ -669,6 +669,14 @@
       "area": "ESG",
       "label": "Progress: positive impact projects",
       "recurrence": "monthly"
+    },
+    {
+      "id": 200,
+      "month": 3,
+      "day": 23,
+      "area": "Ops & CS",
+      "label": "Allocation",
+      "desc": ""
     }
   ]
 }
