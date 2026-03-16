@@ -67,14 +67,6 @@
       "desc": ""
     },
     {
-      "id": 9,
-      "month": 4,
-      "day": 30,
-      "area": "Tails",
-      "label": "Portco Budget Review – H1",
-      "recurrence": "semi-annual"
-    },
-    {
       "id": 10,
       "month": 5,
       "day": 15,
@@ -765,5 +757,5 @@
     }
   ],
   "nextId": 255,
-  "updatedAt": "2026-03-16T21:05:55.478Z"
+  "updatedAt": "2026-03-16T21:05:59.563Z"
 }
