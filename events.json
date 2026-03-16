@@ -730,8 +730,16 @@
       "area": "Controllership",
       "label": "Q1 REPORTING PACKAGE DELVERY",
       "desc": "(OFFSHORE FINANCIALS, CAP TABLES, Q REPORT)"
+    },
+    {
+      "id": 230,
+      "month": 5,
+      "day": 16,
+      "area": "Controllership",
+      "label": "Q1 SUPPLEMENTARY REPORTING PACKAGE DELVERY",
+      "desc": "(GALAXY, AGF LATAM, SPV COINVESTROS 1 AND 2 FINANCIALS AND CAP TABLES AND LP ADDITIONAL INFORMATION)"
     }
   ],
-  "nextId": 230,
-  "updatedAt": "2026-03-16T20:59:32.060Z"
+  "nextId": 231,
+  "updatedAt": "2026-03-16T21:00:09.340Z"
 }
