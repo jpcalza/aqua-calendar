@@ -554,29 +554,44 @@ let EVENTS=[
 ];
 let nextId=200;
 
-// PERSISTENCE — shared across all users via window.storage
+// PERSISTENCE — window.storage (shared, in Claude artifacts) with localStorage fallback
 const STORAGE_KEY='aqua-cal-events';
 const DEFAULT_EVENTS=JSON.parse(JSON.stringify(EVENTS));
 
+const hasCloudStorage=typeof window.storage!=='undefined'&&window.storage&&typeof window.storage.set==='function';
+
 async function saveData(){
-  try{
-    if(window.storage){
-      await window.storage.set(STORAGE_KEY,JSON.stringify({events:EVENTS,nextId:nextId}),true);
-    }
-  }catch(e){console.error('Save error:',e);}
+  const payload=JSON.stringify({events:EVENTS,nextId:nextId});
+  // Try cloud storage first (shared)
+  if(hasCloudStorage){
+    try{await window.storage.set(STORAGE_KEY,payload,true);}catch(e){}
+  }
+  // Always save to localStorage as fallback
+  try{localStorage.setItem(STORAGE_KEY,payload);}catch(e){}
 }
 
 async function loadData(){
-  try{
-    if(window.storage){
+  let loaded=false;
+  // Try cloud storage first
+  if(hasCloudStorage){
+    try{
       const r=await window.storage.get(STORAGE_KEY,true);
       if(r&&r.value){
         const d=JSON.parse(r.value);
-        if(d.events)EVENTS=d.events;
-        if(d.nextId)nextId=d.nextId;
+        if(d.events&&d.events.length){EVENTS=d.events;nextId=d.nextId||200;loaded=true;}
       }
-    }
-  }catch(e){/* First load — using default events */}
+    }catch(e){}
+  }
+  // Fallback to localStorage
+  if(!loaded){
+    try{
+      const raw=localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const d=JSON.parse(raw);
+        if(d.events&&d.events.length){EVENTS=d.events;nextId=d.nextId||200;loaded=true;}
+      }
+    }catch(e){}
+  }
 }
 
 async function resetData(){
