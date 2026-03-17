@@ -147,8 +147,8 @@ body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background
 .q-badge { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
 
 /* COLLAPSE */
-.month-body { transition: max-height 0.3s ease, opacity 0.25s; overflow: hidden; }
-.month-body.collapsed { max-height: 0 !important; opacity: 0; }
+.month-body { transition: max-height 0.3s ease, opacity 0.25s, padding 0.25s; overflow: hidden; }
+.month-body.collapsed { max-height: 0 !important; opacity: 0; padding: 0; }
 
 /* CALENDAR */
 .cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); padding: 8px 10px 4px; }
@@ -167,7 +167,7 @@ body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background
 .cell-more:hover { color: var(--accent-indigo); }
 
 /* EVENT LIST */
-.events-list { padding: 8px 10px; min-height: 40px; }
+.events-list { padding: 8px 10px; }
 .event-row { display: flex; gap: 7px; padding: 5px 7px; border-radius: 7px; margin-bottom: 4px; cursor: pointer; transition: opacity 0.15s, transform 0.15s; position: relative; }
 .event-row:hover { opacity: 0.85; transform: translateX(2px); }
 .event-row.drag-source { opacity: 0.4; }
@@ -318,8 +318,8 @@ select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http
 .event-row.is-upcoming::before { content: ''; position: absolute; top: 4px; right: 4px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-indigo); animation: pulse 2s ease-in-out infinite; }
 
 /* MINI CALENDAR SIDEBAR */
-.month-view-layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
-.mini-cal { background: var(--bg-card); border: 1px solid var(--border-main); border-radius: 12px; padding: 12px; box-shadow: var(--shadow-card); height: fit-content; position: sticky; top: 280px; }
+.month-view-layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; align-items: start; }
+.mini-cal { background: var(--bg-card); border: 1px solid var(--border-main); border-radius: 12px; padding: 12px; box-shadow: var(--shadow-card); height: fit-content; position: sticky; top: 160px; }
 .mini-cal-title { font-size: 12px; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 8px; }
 .mini-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
 .mini-cal-wd { text-align: center; font-size: 9px; font-weight: 700; color: var(--text-tertiary); padding: 2px 0; }
