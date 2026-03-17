@@ -1,15 +1,6 @@
 {
   "events": [
     {
-      "id": 1,
-      "month": 1,
-      "day": 31,
-      "area": "Regulatory",
-      "label": "ANBIMA – Informe Mensal",
-      "recurrence": "monthly",
-      "desc": ""
-    },
-    {
       "id": 3,
       "month": 2,
       "day": 15,
@@ -824,5 +815,5 @@
     }
   ],
   "nextId": 270,
-  "updatedAt": "2026-03-17T19:30:12.101Z"
+  "updatedAt": "2026-03-17T19:30:15.765Z"
 }
