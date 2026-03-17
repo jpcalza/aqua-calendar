@@ -6,7 +6,8 @@
       "day": 31,
       "area": "Regulatory",
       "label": "ANBIMA – Informe Mensal",
-      "recurrence": "monthly"
+      "recurrence": "monthly",
+      "desc": ""
     },
     {
       "id": 2,
@@ -821,5 +822,5 @@
     }
   ],
   "nextId": 268,
-  "updatedAt": "2026-03-17T18:45:42.808Z"
+  "updatedAt": "2026-03-17T18:46:59.245Z"
 }
