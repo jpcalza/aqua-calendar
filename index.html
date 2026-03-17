@@ -34,7 +34,7 @@
   --shadow-modal: 0 20px 60px rgba(0,0,0,0.5);
 }}
 body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg-app); min-height: 100vh; color: var(--text-primary); }
-.app { max-width: 1440px; margin: 0 auto; padding: 28px 24px 60px; }
+.app { max-width: 1440px; margin: 0 auto; padding: 28px 24px 60px; min-width: 320px; }
 
 /* STICKY */
 .sticky-wrap { position: sticky; top: 0; z-index: 100; background: var(--bg-app); padding-bottom: 12px; transition: box-shadow 0.25s; }
@@ -99,6 +99,8 @@ body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background
 .agenda-recur-tag { font-size: 9px; background: var(--tag-recur-bg); color: var(--tag-recur-text); border-radius: 3px; padding: 1px 5px; }
 .agenda-countdown { font-size: 10px; color: var(--text-tertiary); font-weight: 500; }
 .agenda-past { opacity: 0.5; }
+.agenda-month-body { transition: max-height 0.3s ease, opacity 0.25s; overflow: hidden; max-height: 2000px; }
+.agenda-month-body.collapsed { max-height: 0 !important; opacity: 0; }
 
 /* WEEK GROUPING (quarter view) */
 .week-group { margin-bottom: 8px; }
@@ -117,8 +119,8 @@ body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background
 
 /* GRID */
 .cal-grid { display: grid; gap: 12px; }
-.cal-grid.year { grid-template-columns: repeat(4, 1fr); }
-.cal-grid.quarter { grid-template-columns: repeat(3, 1fr); }
+.cal-grid.year { grid-template-columns: repeat(4, minmax(240px, 1fr)); }
+.cal-grid.quarter { grid-template-columns: repeat(3, minmax(280px, 1fr)); }
 .cal-grid.month { grid-template-columns: 1fr; }
 
 /* ANIMATIONS */
@@ -967,39 +969,63 @@ function renderMC(mi,f,v){
 const WEEKDAYS_FULL=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
 function renderAgenda(f){
   const sorted=f.slice().sort((a,b)=>a.month-b.month||a.day-b.day);
-  let html='<div class="agenda-list">';
-  let curMonth=-1;
+  // Group by month
+  const groups={};
   sorted.forEach(ev=>{
-    if(ev.month!==curMonth){
-      const mEvs=sorted.filter(e=>e.month===ev.month);
-      html+=`<div class="agenda-month-header">${MF[ev.month-1]}<span class="agenda-month-count">${mEvs.length}</span></div>`;
-      curMonth=ev.month;
-    }
-    const c=gC(ev.area);
-    const evDate=new Date(2026,ev.month-1,ev.day);
-    const diff=Math.ceil((evDate-today)/(1000*60*60*24));
-    let countdown='';
-    if(diff===0)countdown='Hoje';
-    else if(diff===1)countdown='Amanhã';
-    else if(diff>1&&diff<=30)countdown=`em ${diff}d`;
-    else if(diff<0)countdown=`${Math.abs(diff)}d atrás`;
-    const isPast=diff<0;
-    const wd=WEEKDAYS_FULL[evDate.getDay()];
-    html+=`<div class="agenda-item${isPast?' agenda-past':''}" onclick="showDetail(${ev.id})">
-      <div class="agenda-date-col"><div class="agenda-day">${ev.day}</div><div class="agenda-weekday">${wd.slice(0,3)}</div></div>
-      <div class="agenda-bar" style="background:${c.border}"></div>
-      <div class="agenda-content">
-        <div class="agenda-title">${ev.label}</div>
-        <div class="agenda-meta">
-          <span class="agenda-area-tag" style="background:${c.border}">${ev.area}</span>
-          ${ev.recurrence?`<span class="agenda-recur-tag">${BG[ev.recurrence]}</span>`:''}
-          ${countdown?`<span class="agenda-countdown">${countdown}</span>`:''}
-        </div>
-      </div>
+    if(!groups[ev.month])groups[ev.month]=[];
+    groups[ev.month].push(ev);
+  });
+  const curMonth=today.getMonth()+1; // 1-based
+  let html='<div class="agenda-list">';
+  Object.entries(groups).forEach(([m,evs])=>{
+    const mi=parseInt(m);
+    const isPastMonth=mi<curMonth;
+    const collapsed=isPastMonth?'collapsed':'';
+    const arrow=isPastMonth?'►':'▼';
+    html+=`<div class="agenda-month-header" style="cursor:pointer" onclick="toggleAgendaMonth(${mi})">
+      <span class="collapse-icon${isPastMonth?' collapsed':''}" id="aci-${mi}" style="font-size:10px;margin-right:4px">${arrow}</span>
+      ${MF[mi-1]}<span class="agenda-month-count">${evs.length}</span>
     </div>`;
+    html+=`<div class="agenda-month-body${isPastMonth?' collapsed':''}" id="amb-${mi}">`;
+    evs.forEach(ev=>{
+      const c=gC(ev.area);
+      const evDate=new Date(2026,ev.month-1,ev.day);
+      const diff=Math.ceil((evDate-today)/(1000*60*60*24));
+      let countdown='';
+      if(diff===0)countdown='Hoje';
+      else if(diff===1)countdown='Amanhã';
+      else if(diff>1&&diff<=30)countdown=`em ${diff}d`;
+      else if(diff<0)countdown=`${Math.abs(diff)}d atrás`;
+      const isPast=diff<0;
+      const wd=WEEKDAYS_FULL[evDate.getDay()];
+      html+=`<div class="agenda-item${isPast?' agenda-past':''}" onclick="showDetail(${ev.id})">
+        <div class="agenda-date-col"><div class="agenda-day">${ev.day}</div><div class="agenda-weekday">${wd.slice(0,3)}</div></div>
+        <div class="agenda-bar" style="background:${c.border}"></div>
+        <div class="agenda-content">
+          <div class="agenda-title">${ev.label}</div>
+          <div class="agenda-meta">
+            <span class="agenda-area-tag" style="background:${c.border}">${ev.area}</span>
+            ${ev.recurrence?`<span class="agenda-recur-tag">${BG[ev.recurrence]}</span>`:''}
+            ${countdown?`<span class="agenda-countdown">${countdown}</span>`:''}
+          </div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
   });
   html+='</div>';
   return html;
+}
+function toggleAgendaMonth(mi){
+  const body=document.getElementById('amb-'+mi);
+  const icon=document.getElementById('aci-'+mi);
+  if(!body)return;
+  body.classList.toggle('collapsed');
+  if(icon){
+    const isC=body.classList.contains('collapsed');
+    icon.classList.toggle('collapsed',isC);
+    icon.textContent=isC?'►':'▼';
+  }
 }
 
 function renderER(ev){const c=gC(ev.area);const hl=S.searchTerm&&S.searchTerm.length>1&&matchesSearch(ev)?' search-highlight':'';const up=isUpcoming(ev)?' is-upcoming':'';
