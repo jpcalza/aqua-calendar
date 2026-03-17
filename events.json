@@ -284,14 +284,6 @@
       "recurrence": "quarterly"
     },
     {
-      "id": 42,
-      "month": 10,
-      "day": 14,
-      "area": "Controllership",
-      "label": "ANBIMA: Reporte Trimestral FIPs + Investidas (Q3/26)",
-      "recurrence": "quarterly"
-    },
-    {
       "id": 43,
       "month": 12,
       "day": 31,
@@ -822,5 +814,5 @@
     }
   ],
   "nextId": 268,
-  "updatedAt": "2026-03-17T19:10:01.198Z"
+  "updatedAt": "2026-03-17T19:17:06.242Z"
 }
