@@ -900,6 +900,8 @@ function expandRecurrence(){
   });
   EVENTS.forEach(ev=>{
     if(!ev.recurrence||!intervals[ev.recurrence])return;
+    // Only expand user-created events (id >= 200), not hardcoded ones
+    if(ev.id<200)return;
     const step=intervals[ev.recurrence];
     const yr=ev.year||2026;
     let m=ev.month-1+step; // 0-based
