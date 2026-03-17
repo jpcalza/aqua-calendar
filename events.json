@@ -811,8 +811,17 @@
       "area": "Aqua",
       "label": "AGM – Annual General Meeting",
       "desc": ""
+    },
+    {
+      "id": 268,
+      "month": 1,
+      "day": 31,
+      "area": "Regulatory",
+      "label": "ANBIMA – Informe Mensal",
+      "recurrence": "monthly",
+      "desc": ""
     }
   ],
-  "nextId": 268,
-  "updatedAt": "2026-03-17T19:17:06.242Z"
+  "nextId": 269,
+  "updatedAt": "2026-03-17T19:29:41.658Z"
 }
