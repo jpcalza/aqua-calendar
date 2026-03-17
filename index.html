@@ -405,6 +405,10 @@ select.form-input { background-image: url("data:image/svg+xml,%3Csvg xmlns='http
       <button class="view-btn" id="vbtn-quarter" onclick="setView('quarter')">Tri</button>
       <button class="view-btn" id="vbtn-year" onclick="setView('year')">Ano</button>
     </div>
+    <div class="view-toggle">
+      <button class="view-btn" id="ybtn-2026" onclick="setYear(2026)">2026</button>
+      <button class="view-btn" id="ybtn-2027" onclick="setYear(2027)">2027</button>
+    </div>
   </div>
 </div>
 
@@ -731,10 +735,10 @@ let S={view:'year',activeAreas:new Set(),activeQ:Math.floor(today.getMonth()/3),
 // INIT
 async function init(){
   await loadData();
+  expandRecurrence();
   document.getElementById('todayText').textContent=today.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   buildFilters();buildLegend();initSticky();initSearch();initKbd();render();
   window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{buildFilters();render();});
-
 }
 
 function initSticky(){const w=document.getElementById('stickyWrap');let t=false;window.addEventListener('scroll',()=>{if(!t){requestAnimationFrame(()=>{w.classList.toggle('scrolled',window.scrollY>20);t=false;});t=true;}},{passive:true});}
@@ -776,7 +780,7 @@ function onDS(e,id){dragId=id;e.dataTransfer.effectAllowed='move';e.dataTransfer
 function onDE(){document.querySelectorAll('.drag-source').forEach(el=>el.classList.remove('drag-source'));document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));dragId=null;}
 function onCDO(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
 function onCDL(e){e.currentTarget.classList.remove('drag-over');}
-function onCD(e,m){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(dragId===null)return;const ev=EVENTS.find(x=>x.id===dragId);if(!ev)return;ev.month=m;const mx=new Date(2026,m,0).getDate();if(ev.day>mx)ev.day=mx;saveData();render();}
+function onCD(e,m){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(dragId===null)return;const ev=EVENTS.find(x=>x.id===dragId);if(!ev)return;ev.month=m;const mx=new Date(S.viewYear,m,0).getDate();if(ev.day>mx)ev.day=mx;saveData();render();}
 
 // COLLAPSE
 function toggleCollapse(mi){if(S.collapsed.has(mi))S.collapsed.delete(mi);else S.collapsed.add(mi);const b=document.getElementById(`mb-${mi}`),ic=document.getElementById(`ci-${mi}`);if(b)b.classList.toggle('collapsed');if(ic)ic.classList.toggle('collapsed');}
@@ -856,27 +860,61 @@ function doExportICS(){
   const ids=new Set([...checks].map(c=>parseInt(c.value)));
   const sel=EVENTS.filter(e=>ids.has(e.id)).sort((a,b)=>a.month-b.month||a.day-b.day);
   if(!sel.length){alert('Selecione ao menos 1 evento.');return;}
-  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//AquaCapital//AquaCalendar//PT\r\nCALSCALE:GREGORIAN\r\nX-WR-CALNAME:Aqua Calendar 2026\r\n';
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//AquaCapital//AquaCalendar//PT\r\nCALSCALE:GREGORIAN\r\nX-WR-CALNAME:Aqua Calendar\r\n';
   sel.forEach(ev=>{
-    const dt=`2026${String(ev.month).padStart(2,'0')}${String(ev.day).padStart(2,'0')}`;
+    const yr=ev.year||2026;const dt=`${yr}${String(ev.month).padStart(2,'0')}${String(ev.day).padStart(2,'0')}`;
     const uid=`aqua-${ev.id}@aquacapital.com`;
     const desc=(ev.desc||'').replace(/\n/g,'\\n');
     ics+=`BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:${dt}\r\nDTEND;VALUE=DATE:${dt}\r\nSUMMARY:${ev.label}\r\nDESCRIPTION:Área: ${ev.area}${ev.recurrence?' | '+BG[ev.recurrence]:''}${desc?' | '+desc:''}\r\nCATEGORIES:${ev.area}\r\nUID:${uid}\r\nEND:VEVENT\r\n`;
   });
   ics+='END:VCALENDAR\r\n';
   const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='aqua-calendario-2026.ics';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`aqua-calendario-${S.viewYear}.ics`;a.click();
   document.getElementById('icsOverlay').remove();
 }
 
-// FILTERS
-function getFiltered(){return EVENTS.filter(e=>(S.activeAreas.size===0||S.activeAreas.has(e.area))&&matchesSearch(e));}
+// RECURRENCE EXPANSION — generates virtual events up to Dec 2027
+let EXPANDED=[];
+function expandRecurrence(){
+  EXPANDED=[];
+  const intervals={monthly:1,quarterly:3,'semi-annual':6,annual:12};
+  const maxDate=new Date(2027,11,31);
+  let genId=-1;
+  EVENTS.forEach(ev=>{
+    if(!ev.recurrence||!intervals[ev.recurrence])return;
+    const step=intervals[ev.recurrence];
+    const yr=ev.year||2026;
+    // Start from the event's original date, step forward
+    let m=ev.month-1+step; // 0-based month offset
+    let y=yr;
+    while(m>=12){m-=12;y++;}
+    while(new Date(y,m,1)<=maxDate){
+      const maxDay=new Date(y,m+1,0).getDate();
+      const day=Math.min(ev.day,maxDay);
+      EXPANDED.push({...ev,id:genId--,month:m+1,day,year:y,_generated:true,_sourceId:ev.id});
+      m+=step;
+      while(m>=12){m-=12;y++;}
+    }
+  });
+}
+
+// FILTERS — combines real EVENTS + expanded recurrence copies
+function getFiltered(){
+  const all=[...EVENTS,...EXPANDED];
+  // Filter by current view year
+  const yr=S.viewYear||2026;
+  return all.filter(e=>{
+    const eyr=e.year||2026;
+    if(eyr!==yr)return false;
+    return(S.activeAreas.size===0||S.activeAreas.has(e.area))&&matchesSearch(e);
+  });
+}
 
 // DUPLICATE
-function duplicateEvent(){const ev=EVENTS.find(e=>e.id===cId);if(!ev)return;const nev={...ev,id:nextId++,label:ev.label+' (cópia)'};EVENTS.push(nev);saveData();closeAll();render();}
+function duplicateEvent(){let ev=EVENTS.find(e=>e.id===cId);if(!ev)ev=EXPANDED.find(e=>e.id===cId);if(!ev)return;const nev={...ev,id:nextId++,label:ev.label+' (cópia)'};EVENTS.push(nev);saveData();closeAll();render();}
 
 // UPCOMING CHECK (next 7 days)
-function isUpcoming(ev){const evDate=new Date(2026,ev.month-1,ev.day);const diff=(evDate-today)/(1000*60*60*24);return diff>0&&diff<=7;}
+function isUpcoming(ev){const yr=ev.year||2026;const evDate=new Date(yr,ev.month-1,ev.day);const diff=(evDate-today)/(1000*60*60*24);return diff>0&&diff<=7;}
 
 function buildFilters(){const areas=Object.keys(AC),el=document.getElementById('filterGroup'),all=S.activeAreas.size===0,d=dk();
   const as=all?(d?'border-color:#f1f5f9;background:#f1f5f9;color:#0f172a;font-weight:700':'border-color:#0f172a;background:#0f172a;color:#fff;font-weight:700'):'';
@@ -887,6 +925,7 @@ function buildLegend(){const el=document.getElementById('legend');const items=Ob
 
 // VIEW
 function setView(v){S.view=v;if(v==='quarter'||v==='month')S.activeQ=Math.floor(S.viewMonth/3);render();}
+function setYear(y){S.viewYear=y;render();}
 function setQ(q){S.activeQ=q;if(S.view==='month')S.viewMonth=q*3;render();}
 function toggleArea(a){if(S.activeAreas.has(a))S.activeAreas.delete(a);else S.activeAreas.add(a);buildFilters();render();}
 function clearFilters(){S.activeAreas.clear();buildFilters();render();}
@@ -894,7 +933,7 @@ function navMonth(d){S.viewMonth+=d;if(S.viewMonth>11){S.viewMonth=0;S.viewYear+
 function jumpToday(){S.viewMonth=today.getMonth();S.viewYear=today.getFullYear();S.activeQ=Math.floor(today.getMonth()/3);render();}
 
 // RENDER
-function render(){const{view:v,activeQ:aq}=S;const f=getFiltered();
+function render(){expandRecurrence();const{view:v,activeQ:aq}=S;const f=getFiltered();
   // Count upcoming
   const upEvs=f.filter(isUpcoming).sort((a,b)=>a.month-b.month||a.day-b.day);
   let upBadge='';
@@ -902,8 +941,9 @@ function render(){const{view:v,activeQ:aq}=S;const f=getFiltered();
     const tipItems=upEvs.map(ev=>{const c=gC(ev.area);return`<div class="upcoming-tip-item"><span class="upcoming-tip-date">${ev.day}/${MS[ev.month-1]}</span><span class="upcoming-tip-label">${ev.label}</span><span class="upcoming-tip-area" style="background:${c.border}">${ev.area}</span></div>`;}).join('');
     upBadge=` · <span class="upcoming-wrap"><span class="upcoming-badge" style="display:inline-block;position:relative;padding-right:12px">${upEvs.length} próximo${upEvs.length!==1?'s':''}</span><div class="upcoming-tip"><div class="upcoming-tip-title">Próximos 7 dias</div>${tipItems}</div></span>`;
   }
-  document.getElementById('subCount').innerHTML=`${f.length} entrega${f.length!==1?'s':''} · 2026${upBadge}`;
+  document.getElementById('subCount').innerHTML=`${f.length} entrega${f.length!==1?'s':''} · ${S.viewYear}${upBadge}`;
   ['agenda','month','quarter','year'].forEach(x=>document.getElementById(`vbtn-${x}`).classList.toggle('active',v===x));
+  [2026,2027].forEach(y=>document.getElementById(`ybtn-${y}`).classList.toggle('active',S.viewYear===y));
   // Nav row — show for quarter and month views
   const showNav=v==='quarter'||v==='month';
   document.getElementById('navRow').style.display=showNav?'flex':'none';
@@ -947,8 +987,8 @@ function renderMC(mi,f,v){
     // Group by week
     const weeks={};
     evs.forEach(ev=>{
-      const d=new Date(2026,mi,ev.day);
-      const startOfYear=new Date(2026,0,1);
+      const d=new Date(S.viewYear,mi,ev.day);
+      const startOfYear=new Date(S.viewYear,0,1);
       const wn=Math.ceil(((d-startOfYear)/86400000+startOfYear.getDay()+1)/7);
       if(!weeks[wn])weeks[wn]=[];
       weeks[wn].push(ev);
@@ -989,7 +1029,7 @@ function renderAgenda(f){
     html+=`<div class="agenda-month-body${isPastMonth?' collapsed':''}" id="amb-${mi}">`;
     evs.forEach(ev=>{
       const c=gC(ev.area);
-      const evDate=new Date(2026,ev.month-1,ev.day);
+      const evDate=new Date(ev.year||2026,ev.month-1,ev.day);
       const diff=Math.ceil((evDate-today)/(1000*60*60*24));
       let countdown='';
       if(diff===0)countdown='Hoje';
@@ -1073,14 +1113,14 @@ function renderMiniCal(mi,yr){
 
 // MODALS
 let cId=null;
-function showDetail(id){hideTT();const ev=EVENTS.find(e=>e.id===id);if(!ev)return;cId=id;const c=gC(ev.area);
+function showDetail(id){hideTT();let ev=EVENTS.find(e=>e.id===id);if(!ev)ev=EXPANDED.find(e=>e.id===id);if(!ev)return;cId=id;const c=gC(ev.area);
   document.getElementById('dAreaBadge').style.cssText=`background:${c.bg};color:${c.text};border:1.5px solid ${c.border}`;
   document.getElementById('dAreaBadge').innerHTML=`<div style="width:8px;height:8px;border-radius:50%;background:${c.border}"></div>${ev.area}`;
   document.getElementById('dTitle').textContent=ev.label;
   document.getElementById('dDate').innerHTML=`📅 ${ev.day} de ${MF[ev.month-1]}${ev.recurrence?` &nbsp;·&nbsp; ${BG[ev.recurrence]}`:''}`;
   document.getElementById('dDesc').textContent=ev.desc||'Sem descrição adicional.';
   document.getElementById('detailOverlay').classList.add('open');}
-function openEdit(){const ev=EVENTS.find(e=>e.id===cId);if(!ev)return;document.getElementById('editTitle').value=ev.label;document.getElementById('editMonth').value=ev.month;document.getElementById('editDay').value=ev.day;document.getElementById('editArea').value=ev.area;document.getElementById('editRecur').value=ev.recurrence||'';document.getElementById('editDesc').value=ev.desc||'';document.getElementById('detailOverlay').classList.remove('open');document.getElementById('editOverlay').classList.add('open');}
+function openEdit(){let ev=EVENTS.find(e=>e.id===cId);if(!ev)ev=EXPANDED.find(e=>e.id===cId);if(!ev)return;document.getElementById('editTitle').value=ev.label;document.getElementById('editMonth').value=ev.month;document.getElementById('editDay').value=ev.day;document.getElementById('editArea').value=ev.area;document.getElementById('editRecur').value=ev.recurrence||'';document.getElementById('editDesc').value=ev.desc||'';document.getElementById('detailOverlay').classList.remove('open');document.getElementById('editOverlay').classList.add('open');}
 function saveEdit(){const idx=EVENTS.findIndex(e=>e.id===cId);if(idx===-1)return;const t=document.getElementById('editTitle').value.trim(),m=parseInt(document.getElementById('editMonth').value),d=parseInt(document.getElementById('editDay').value),a=document.getElementById('editArea').value,r=document.getElementById('editRecur').value,desc=document.getElementById('editDesc').value.trim();if(!t||!d){alert('Preencha título e dia.');return;}EVENTS[idx]={...EVENTS[idx],label:t,month:m,day:d,area:a,recurrence:r||undefined,desc};saveData();closeAll();render();}
 function deleteEvent(){if(!confirm('Deletar este evento?'))return;EVENTS=EVENTS.filter(e=>e.id!==cId);saveData();closeAll();render();}
 function openAdd(){const d=new Date().toISOString().split('T')[0];document.getElementById('evTitle').value='';document.getElementById('evStart').value=d;document.getElementById('evEnd').value=d;document.getElementById('evDesc').value='';document.getElementById('evRecur').value='';document.getElementById('evPeriodToggle').checked=false;document.getElementById('evEndWrap').style.display='none';document.getElementById('addOverlay').classList.add('open');}
