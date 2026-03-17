@@ -874,24 +874,46 @@ function doExportICS(){
 }
 
 // RECURRENCE EXPANSION — generates virtual events up to Dec 2027
+// Exceptions: stored in localStorage, tracks deleted instances of recurring events
 let EXPANDED=[];
+const EXCEPT_KEY='aqua-cal-recur-exceptions';
+function getExceptions(){try{return JSON.parse(localStorage.getItem(EXCEPT_KEY)||'[]');}catch(e){return[];}}
+function addException(sourceId,month,year){
+  const ex=getExceptions();
+  ex.push({sourceId,month,year});
+  localStorage.setItem(EXCEPT_KEY,JSON.stringify(ex));
+}
+function isException(sourceId,month,year){
+  return getExceptions().some(e=>e.sourceId===sourceId&&e.month===month&&e.year===year);
+}
+
 function expandRecurrence(){
   EXPANDED=[];
   const intervals={monthly:1,quarterly:3,'semi-annual':6,annual:12};
   const maxDate=new Date(2027,11,31);
   let genId=-1;
+  // Build index of existing real events: "area|label|month|year" to avoid duplicates
+  const existing=new Set();
+  EVENTS.forEach(ev=>{
+    const yr=ev.year||2026;
+    existing.add(`${ev.area}|${ev.label}|${ev.month}|${yr}`);
+  });
   EVENTS.forEach(ev=>{
     if(!ev.recurrence||!intervals[ev.recurrence])return;
     const step=intervals[ev.recurrence];
     const yr=ev.year||2026;
-    // Start from the event's original date, step forward
-    let m=ev.month-1+step; // 0-based month offset
+    let m=ev.month-1+step; // 0-based
     let y=yr;
     while(m>=12){m-=12;y++;}
     while(new Date(y,m,1)<=maxDate){
+      const mo=m+1; // 1-based
       const maxDay=new Date(y,m+1,0).getDate();
       const day=Math.min(ev.day,maxDay);
-      EXPANDED.push({...ev,id:genId--,month:m+1,day,year:y,_generated:true,_sourceId:ev.id});
+      const key=`${ev.area}|${ev.label}|${mo}|${y}`;
+      // Skip if a real event already exists for this slot, or if it's an exception
+      if(!existing.has(key)&&!isException(ev.id,mo,y)){
+        EXPANDED.push({...ev,id:genId--,month:mo,day,year:y,_generated:true,_sourceId:ev.id});
+      }
       m+=step;
       while(m>=12){m-=12;y++;}
     }
@@ -1122,7 +1144,20 @@ function showDetail(id){hideTT();let ev=EVENTS.find(e=>e.id===id);if(!ev)ev=EXPA
   document.getElementById('detailOverlay').classList.add('open');}
 function openEdit(){let ev=EVENTS.find(e=>e.id===cId);if(!ev)ev=EXPANDED.find(e=>e.id===cId);if(!ev)return;document.getElementById('editTitle').value=ev.label;document.getElementById('editMonth').value=ev.month;document.getElementById('editDay').value=ev.day;document.getElementById('editArea').value=ev.area;document.getElementById('editRecur').value=ev.recurrence||'';document.getElementById('editDesc').value=ev.desc||'';document.getElementById('detailOverlay').classList.remove('open');document.getElementById('editOverlay').classList.add('open');}
 function saveEdit(){const idx=EVENTS.findIndex(e=>e.id===cId);if(idx===-1)return;const t=document.getElementById('editTitle').value.trim(),m=parseInt(document.getElementById('editMonth').value),d=parseInt(document.getElementById('editDay').value),a=document.getElementById('editArea').value,r=document.getElementById('editRecur').value,desc=document.getElementById('editDesc').value.trim();if(!t||!d){alert('Preencha título e dia.');return;}EVENTS[idx]={...EVENTS[idx],label:t,month:m,day:d,area:a,recurrence:r||undefined,desc};saveData();closeAll();render();}
-function deleteEvent(){if(!confirm('Deletar este evento?'))return;EVENTS=EVENTS.filter(e=>e.id!==cId);saveData();closeAll();render();}
+function deleteEvent(){
+  if(!confirm('Deletar este evento?'))return;
+  // Check if it's a generated (virtual) event
+  const genEv=EXPANDED.find(e=>e.id===cId);
+  if(genEv){
+    // Add exception — this instance won't appear again
+    addException(genEv._sourceId,genEv.month,genEv.year||2026);
+  }else{
+    // Real event — delete it
+    EVENTS=EVENTS.filter(e=>e.id!==cId);
+    saveData();
+  }
+  closeAll();render();
+}
 function openAdd(){const d=new Date().toISOString().split('T')[0];document.getElementById('evTitle').value='';document.getElementById('evStart').value=d;document.getElementById('evEnd').value=d;document.getElementById('evDesc').value='';document.getElementById('evRecur').value='';document.getElementById('evPeriodToggle').checked=false;document.getElementById('evEndWrap').style.display='none';document.getElementById('addOverlay').classList.add('open');}
 function addEvent(){const t=document.getElementById('evTitle').value.trim(),s=document.getElementById('evStart').value,a=document.getElementById('evArea').value,r=document.getElementById('evRecur').value,desc=document.getElementById('evDesc').value.trim(),isPeriod=document.getElementById('evPeriodToggle').checked,endVal=document.getElementById('evEnd').value;if(!t||!s){alert('Preencha título e data.');return;}
   if(isPeriod&&endVal&&endVal>s){
