@@ -105,11 +105,12 @@
     },
     {
       "id": 18,
-      "month": 8,
-      "day": 15,
+      "month": 7,
+      "day": 14,
       "area": "Legal",
       "label": "Q2 Legal Report",
-      "recurrence": "quarterly"
+      "recurrence": "quarterly",
+      "desc": ""
     },
     {
       "id": 19,
@@ -817,5 +818,5 @@
     }
   ],
   "nextId": 270,
-  "updatedAt": "2026-03-25T19:49:26.415Z"
+  "updatedAt": "2026-03-25T19:49:54.346Z"
 }
