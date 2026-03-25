@@ -19,10 +19,11 @@
     {
       "id": 5,
       "month": 3,
-      "day": 15,
+      "day": 14,
       "area": "Legal",
       "label": "Q4 Legal Report",
-      "recurrence": "quarterly"
+      "recurrence": "quarterly",
+      "desc": ""
     },
     {
       "id": 6,
@@ -815,5 +816,5 @@
     }
   ],
   "nextId": 270,
-  "updatedAt": "2026-03-17T19:30:15.765Z"
+  "updatedAt": "2026-03-25T19:45:21.139Z"
 }
